@@ -338,10 +338,30 @@ class Application(object):
         self.serverlog.set_log_level(6)
         self.rpc_service = JSONRPCServiceCustom()
         self.method_authentication = dict()
-        self.rpc_service.add(impl_AbstractHandle.run_handle_service2,
-                             name='AbstractHandle.run_handle_service2',
+        self.rpc_service.add(impl_AbstractHandle.persist_handle,
+                             name='AbstractHandle.persist_handle',
                              types=[dict])
-        self.method_authentication['AbstractHandle.run_handle_service2'] = 'required'  # noqa
+        self.method_authentication['AbstractHandle.persist_handle'] = 'required'  # noqa
+        self.rpc_service.add(impl_AbstractHandle.hids_to_handles,
+                             name='AbstractHandle.hids_to_handles',
+                             types=[list])
+        self.method_authentication['AbstractHandle.hids_to_handles'] = 'required'  # noqa
+        self.rpc_service.add(impl_AbstractHandle.ids_to_handles,
+                             name='AbstractHandle.ids_to_handles',
+                             types=[list])
+        self.method_authentication['AbstractHandle.ids_to_handles'] = 'required'  # noqa
+        self.rpc_service.add(impl_AbstractHandle.fetch_handles_by,
+                             name='AbstractHandle.fetch_handles_by',
+                             types=[dict])
+        self.method_authentication['AbstractHandle.fetch_handles_by'] = 'required'  # noqa
+        self.rpc_service.add(impl_AbstractHandle.is_owner,
+                             name='AbstractHandle.is_owner',
+                             types=[list])
+        self.method_authentication['AbstractHandle.is_owner'] = 'required'  # noqa
+        self.rpc_service.add(impl_AbstractHandle.delete_handles,
+                             name='AbstractHandle.delete_handles',
+                             types=[list])
+        self.method_authentication['AbstractHandle.delete_handles'] = 'required'  # noqa
         self.rpc_service.add(impl_AbstractHandle.status,
                              name='AbstractHandle.status',
                              types=[dict])
