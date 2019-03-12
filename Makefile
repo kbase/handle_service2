@@ -1,7 +1,8 @@
-SERVICE = handle_service2
-SERVICE_CAPS = handle_service2
+SERVICE = handle_service
+SERVICE_CAPS = AbstractHandle
+SERVICE_NAME = AbstractHandle
 SPEC_FILE = handle_service2.spec
-URL = https://kbase.us/services/handle_service2
+URL = https://kbase.us/services/handle_service
 DIR = $(shell pwd)
 LIB_DIR = lib
 SCRIPTS_DIR = scripts

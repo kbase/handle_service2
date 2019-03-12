@@ -1,8 +1,8 @@
 /*
-A KBase module: handle_service2
+A KBase module: AbstractHandle
 */
 
-module handle_service2 {
+module AbstractHandle {
     typedef structure {
         string report_name;
         string report_ref;

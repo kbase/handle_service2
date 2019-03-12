@@ -1,8 +1,8 @@
 module-name:
-    handle_service2
+    AbstractHandle
 
 module-description:
-    A KBase module
+    Core KBase service that manages Handle objects
 
 service-language:
     python

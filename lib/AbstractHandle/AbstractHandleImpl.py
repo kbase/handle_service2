@@ -3,13 +3,13 @@
 #END_HEADER
 
 
-class handle_service2:
+class AbstractHandle:
     '''
     Module Name:
-    handle_service2
+    AbstractHandle
 
     Module Description:
-    A KBase module: handle_service2
+    A KBase module: AbstractHandle
     '''
 
     ######## WARNING FOR GEVENT USERS ####### noqa
@@ -19,8 +19,8 @@ class handle_service2:
     # the latter method is running.
     ######################################### noqa
     VERSION = "0.0.1"
-    GIT_URL = ""
-    GIT_COMMIT_HASH = ""
+    GIT_URL = "git@github.com:Tianhao-Gu/handle_service2.git"
+    GIT_COMMIT_HASH = "837b9933d4d443880b7d171609861ac810a4bd86"
 
     #BEGIN_CLASS_HEADER
     #END_CLASS_HEADER
