@@ -25,7 +25,7 @@ script:
 after_success:
 - cp test_local/workdir/.coverage .
 - sudo mkdir -p /kb/module/lib/
-- sudo cp -R test_local/workdir/kb/module/lib/kb_tophat2 /kb/module/lib/
+- sudo cp -R test_local/workdir/kb/module/lib/handle_service2 /kb/module/lib/
 - coverage report -m
 - coveralls
 env:
