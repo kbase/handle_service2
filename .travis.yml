@@ -1,4 +1,6 @@
 language: python
+python:
+  - "3.6"
 
 sudo: required
 
@@ -27,6 +29,5 @@ install:
 
 script:
   - kb-sdk validate
-
 
 after_script:
