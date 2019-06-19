@@ -2,6 +2,7 @@
 mongo-host  = {{ default .Env.mongo_host "localhost" }}
 mongo-port  = {{ default .Env.mongo_port "27017" }}
 mongo-database = {{ default .Env.mongo_database "handle_db" }}
+mongo-authmechanism = {{ default .Env.mongo_authMechanism "DEFAULT" }}
 
 # KBase auth roles for the account approved to assign/modify shock node ACLs (run add_read_acl).
 admin-roles = {{ default .Env.admin_roles "HANDLE_ADMIN, KBASE_ADMIN" }}
