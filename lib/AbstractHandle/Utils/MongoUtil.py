@@ -66,8 +66,8 @@ class MongoUtil:
         self.mongo_host = config['mongo-host']
         self.mongo_port = int(config['mongo-port'])
         self.mongo_database = config['mongo-database']
-	self.mongo_user = config['mongo-user']
-	self.mongo_pass = config['mongo-pass']
+        self.mongo_user = config['mongo-user']
+        self.mongo_pass = config['mongo-pass']
         self.mongo_authmechanism = config['mongo-authmechanism']
 
         self.mongo_collection = config['mongo-collection']
@@ -76,13 +76,13 @@ class MongoUtil:
         self._start_service()
         self.handle_collection = self._get_collection(self.mongo_host, self.mongo_port,
                                                       self.mongo_database, self.mongo_collection,
-						      self.mongo_user, self.mongo_pass,
+                                                      self.mongo_user, self.mongo_pass,
                                                       self.mongo_authmechanism)
 
         self.hid_counter_collection = self._get_collection(self.mongo_host, self.mongo_port,
                                                            self.mongo_database,
                                                            self.mongo_hid_counter_collection,
-						           self.mongo_user, self.mongo_pass,
+                                                           self.mongo_user, self.mongo_pass,
                                                            self.mongo_authmechanism)
 
         logging.basicConfig(format='%(created)s %(levelname)s: %(message)s',
