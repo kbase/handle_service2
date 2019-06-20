@@ -31,7 +31,7 @@ class MongoUtil:
         connect Mongo server and return a collection
         """
 
-        my_client = MongoClient(mongo_host, mongo_port, mongo_authmechanism)
+        my_client = MongoClient(mongo_host, mongo_port, authMechanism=mongo_authmechanism)
 
         try:
             my_client.server_info()  # force a call to server
