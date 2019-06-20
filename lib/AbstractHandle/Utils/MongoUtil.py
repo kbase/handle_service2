@@ -67,7 +67,7 @@ class MongoUtil:
         self.mongo_port = int(config['mongo-port'])
         self.mongo_database = config['mongo-database']
         self.mongo_user = config['mongo-user']
-        self.mongo_pass = config['mongo-pass']
+        self.mongo_pass = config['mongo-password']
         self.mongo_authmechanism = config['mongo-authmechanism']
 
         self.mongo_collection = config['mongo-collection']
