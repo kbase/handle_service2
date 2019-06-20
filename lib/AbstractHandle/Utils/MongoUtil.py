@@ -34,9 +34,12 @@ class MongoUtil:
 
         my_client = MongoClient(mongo_host, mongo_port)
         if mongo_user is not None:
+            logging.info('mongo-user found in config file, configuring client for authentication')
             my_client = MongoClient(mongo_host, mongo_port,
 	                            username=mongo_user, password=mongo_password,
                                     authMechanism=mongo_authmechanism)
+        else:
+            logging.info('no mongo-user found in config file, connecting without auth')
 
         try:
             my_client.server_info()  # force a call to server
