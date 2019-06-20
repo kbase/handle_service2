@@ -33,7 +33,7 @@ class MongoUtil:
         """
 
         my_client = MongoClient(mongo_host, mongo_port)
-        if mongo_user is not None:
+        if mongo_user:
             logging.info('mongo-user found in config file, configuring client for authentication')
             my_client = MongoClient(mongo_host, mongo_port,
 	                            username=mongo_user, password=mongo_password,
