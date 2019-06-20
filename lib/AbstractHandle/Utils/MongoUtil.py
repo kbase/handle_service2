@@ -26,12 +26,17 @@ class MongoUtil:
 
         logging.info(stdout)
 
-    def _get_collection(self, mongo_host, mongo_port, mongo_database, mongo_collection, mongo_authmechanism):
+    def _get_collection(self, mongo_host, mongo_port, mongo_database, mongo_collection,
+                        mongo_user=None, mongo_password=None, mongo_authmechanism='DEFAULT'):
         """
         connect Mongo server and return a collection
         """
 
-        my_client = MongoClient(mongo_host, mongo_port, authMechanism=mongo_authmechanism)
+        my_client = MongoClient(mongo_host, mongo_port)
+	if mongo_user is not None:
+	    my_client = MongoClient(mongo_host, mongo_port, 
+	                            username=mongo_user, password=mongo_password,
+				    authMechanism=mongo_authmechanism)
 
         try:
             my_client.server_info()  # force a call to server
@@ -61,18 +66,23 @@ class MongoUtil:
         self.mongo_host = config['mongo-host']
         self.mongo_port = int(config['mongo-port'])
         self.mongo_database = config['mongo-database']
+	self.mongo_user = config['mongo-user']
+	self.mongo_pass = config['mongo-pass']
         self.mongo_authmechanism = config['mongo-authmechanism']
+
         self.mongo_collection = config['mongo-collection']
         self.mongo_hid_counter_collection = config['mongo-hid-counter-collection']
 
         self._start_service()
         self.handle_collection = self._get_collection(self.mongo_host, self.mongo_port,
                                                       self.mongo_database, self.mongo_collection,
+						      self.mongo_user, self.mongo_pass,
                                                       self.mongo_authmechanism)
 
         self.hid_counter_collection = self._get_collection(self.mongo_host, self.mongo_port,
                                                            self.mongo_database,
                                                            self.mongo_hid_counter_collection,
+						           self.mongo_user, self.mongo_pass,
                                                            self.mongo_authmechanism)
 
         logging.basicConfig(format='%(created)s %(levelname)s: %(message)s',
