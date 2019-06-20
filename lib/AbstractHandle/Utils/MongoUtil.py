@@ -34,7 +34,9 @@ class MongoUtil:
 
         my_client = MongoClient(mongo_host, mongo_port)
         if mongo_user is not None:
-	    my_client = MongoClient(mongo_host, mongo_port, username=mongo_user, password=mongo_password, authMechanism=mongo_authmechanism)
+            my_client = MongoClient(mongo_host, mongo_port,
+	                            username=mongo_user, password=mongo_password,
+                                    authMechanism=mongo_authmechanism)
 
         try:
             my_client.server_info()  # force a call to server
