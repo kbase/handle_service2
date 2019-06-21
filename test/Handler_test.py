@@ -27,6 +27,7 @@ class HandlerTest(unittest.TestCase):
         cls.cfg['admin-token'] = cls.token
         cls.cfg['mongo-collection'] = 'handle'
         cls.cfg['mongo-hid-counter-collection'] = 'handle_id_counter'
+        cls.cfg['mongo-authmechanism'] = 'DEFAULT'
 
         # Getting username from Auth profile for token
         authServiceUrl = cls.cfg['auth-service-url']
