@@ -10,8 +10,8 @@ class MongoUtil:
 
     HID_COUNTER_ID = 'hid_counter'
 
-    def _start_service(self):
-        logging.info('starting mongod service')
+    def _start_local_service(self):
+        logging.info('starting local mongod service')
 
         logging.info('running sudo service mongodb start')
         pipe = subprocess.Popen("sudo service mongodb start", shell=True, stdout=subprocess.PIPE,
@@ -36,7 +36,7 @@ class MongoUtil:
         if mongo_user:
             logging.info('mongo-user found in config file, configuring client for authentication')
             my_client = MongoClient(mongo_host, mongo_port,
-	                            username=mongo_user, password=mongo_password,
+                                    username=mongo_user, password=mongo_password,
                                     authMechanism=mongo_authmechanism)
         else:
             logging.info('no mongo-user found in config file, connecting without auth')
@@ -76,7 +76,13 @@ class MongoUtil:
         self.mongo_collection = config['mongo-collection']
         self.mongo_hid_counter_collection = config['mongo-hid-counter-collection']
 
-        self._start_service()
+        try:
+            start_local = int(config.get('start-local-mongo', 1))
+        except Exception:
+            start_local = 1
+        if start_local:
+            self._start_local_service()
+
         self.handle_collection = self._get_collection(self.mongo_host, self.mongo_port,
                                                       self.mongo_database, self.mongo_collection,
                                                       self.mongo_user, self.mongo_pass,

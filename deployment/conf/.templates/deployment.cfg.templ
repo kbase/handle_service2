@@ -6,6 +6,8 @@ mongo-authmechanism = {{ default .Env.mongo_authMechanism "DEFAULT" }}
 mongo-user = {{ default .Env.mongo_user "" }}
 mongo-password = {{ default .Env.mongo_password "" }}
 
+start-local-mongo = {{ default .Env.start_local_mongo "0" }}
+
 shock-url = {{ default .Env.shock_url "http://localhost" }}
 
 # KBase auth roles for the account approved to assign/modify shock node ACLs (run add_read_acl).
