@@ -22,6 +22,7 @@ class MongoUtilTest(unittest.TestCase):
 
         cls.cfg['mongo-collection'] = 'handle'
         cls.cfg['mongo-hid-counter-collection'] = 'handle_id_counter'
+        cls.cfg['mongo-authmechanism'] = 'DEFAULT'
 
         cls.mongo_helper = MongoHelper()
         cls.my_client = cls.mongo_helper.create_test_db(db=cls.cfg['mongo-database'],
