@@ -76,9 +76,6 @@ class MongoUtil:
         self.mongo_collection = config['mongo-collection']
         self.mongo_hid_counter_collection = config['mongo-hid-counter-collection']
 
-        print('fadsfasdf')
-        print(config)
-
         try:
             start_local = int(config.get('start-local-mongo', 1))
         except Exception:
