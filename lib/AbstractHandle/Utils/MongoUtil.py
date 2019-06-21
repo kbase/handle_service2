@@ -33,9 +33,10 @@ class MongoUtil:
         """
 
         if mongo_user:
-            logging.info('mongo-user found in config file, configuring client for authentication')
+            logging.info('mongo-user found in config file, configuring client for authentication using mech ' + str(mongo_authmechanism) )
             my_client = MongoClient(mongo_host, mongo_port,
                                     username=mongo_user, password=mongo_password,
+                                    authSource=mongo_database,
                                     authMechanism=mongo_authmechanism)
         else:
             logging.info('no mongo-user found in config file, connecting without auth')
