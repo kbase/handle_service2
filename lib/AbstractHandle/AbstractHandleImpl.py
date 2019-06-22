@@ -39,7 +39,7 @@ provides a programmatic access to a remote file store
         self.config = config
         self.config['mongo-collection'] = self.MONGO_COLLECTION
         self.config['mongo-hid-counter-collection'] = self.MONGO_HID_COUNTER_COLLECTION
-        self.config['mongo-authmechanism'] = self.MONGO_AUTHMECHANISM
+        self.config.setdefault('mongo-authmechanism', self.MONGO_AUTHMECHANISM)
 
         logging.basicConfig(format='%(created)s %(levelname)s: %(message)s',
                             level=logging.INFO)
