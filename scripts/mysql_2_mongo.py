@@ -103,6 +103,12 @@ def main(argv):
             sql_password = arg
         elif opt == '--mongo_host':
             mongo_host = arg
+        elif opt == '--mongo_username':
+            mongo_username = arg
+        elif opt == '--mongo_password':
+            mongo_password = arg
+        elif opt == '--mongo_authmechanism':
+            mongo_authmechanism = arg
 
     if not all([sql_server, sql_username, sql_password, mongo_host]):
         print('missing one of requried args')
