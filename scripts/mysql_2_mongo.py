@@ -160,7 +160,7 @@ def main(argv):
         if insert_one(my_collection, doc):
             insert_records += 1
 
-        if insert_records/5000 == 0:
+        if insert_records%5000 == 0:
             print('inserted {} records'.format(insert_records))
 
     counter_collection.delete_many({})
