@@ -161,7 +161,7 @@ def main(argv):
             insert_records += 1
 
         if insert_records%5000 == 0:
-            print('inserted {} records'.format(insert_records))
+            print('counter {}, inserted {} records'.format(counter, insert_records))
 
     counter_collection.delete_many({})
     counter_collection.insert_one({'_id': 'hid_counter', 'hid_counter': max_counter + 1})
