@@ -162,7 +162,10 @@ def main(argv):
         doc_insert_list.append(doc)
         
         if len(doc_insert_list) % 1000 == 0:
-            insert_result = my_collection.insert_many(doc_insert_list,ordered=False)
+            try:
+                insert_result = my_collection.insert_many(doc_insert_list,ordered=False)
+            except BulkWriteError as bwe:
+                print(bwe.details)
             print (insert_result)
             doc_insert_list = []
 #        if insert_one(my_collection, doc):
