@@ -34,8 +34,6 @@ def connect_mongo(mongo_host, mongo_port, mongo_database, mongo_collection,
         print('no mongo_user supplied, connecting without auth')
         my_client = MongoClient(mongo_host, mongo_port)
     
-    my_client = MongoClient(mongo_host, mongo_port)
-
     try:
         my_client.server_info()  # force a call to server
     except ServerSelectionTimeoutError as e:
