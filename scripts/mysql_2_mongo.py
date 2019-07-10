@@ -21,7 +21,19 @@ def connect_mysql(sql_server, sql_username, sql_password, sql_database):
     return my_sqldb
 
 
-def connect_mongo(mongo_host, mongo_port, mongo_database, mongo_collection):
+def connect_mongo(mongo_host, mongo_port, mongo_database, mongo_collection,
+                  mongo_user=None, mongo_pass=None, mongo_authmechanism='DEFAULT'):
+
+    if mongo_user:
+        print('mongo_user supplied, configuring client for authentication using mech ' + str(mongo_authmechanism) )
+        my_client = MongoClient(mongo_host, mongo_port,
+                                username=mongo_user, password=mongo_password,
+                                authSource=mongo_database,
+                                authMechanism=mongo_authmechanism)
+    else:
+        print('no mongo_user supplied, connecting without auth')
+        my_client = MongoClient(mongo_host, mongo_port)
+    
     my_client = MongoClient(mongo_host, mongo_port)
 
     try:
@@ -61,20 +73,23 @@ def insert_one(my_collection, doc):
 
 def main(argv):
 
-    input_args = ['sql_server', 'sql_username', 'sql_password', 'mongo_host', 'mongo_username', 'mongo_password']
+    input_args = ['sql_server', 'sql_username', 'sql_password', 'mongo_host',
+                  'mongo_username', 'mongo_password', 'mongo_authmechanism']
     sql_server = ''
     sql_username = ''
     sql_password = ''
     mongo_host = ''
+    
+    usage_string = 'mysql_to_mongo.py --sql_server <sql_server> --sql_username <sql_username> --sql_password <sql_password> --mongo_host <mongo_host> [ --mongo_username <mongo_username> --mongo_password <mongo_password> ]'
 
     try:
         opts, args = getopt.getopt(argv, "h", [a + '=' for a in input_args])
     except getopt.GetoptError:
-        print('mysql_to_mongo.py --sql_server <sql_server> --sql_username <sql_username> --sql_password <sql_password> --mongo_host <mongo_host> [ --mongo_username <mongo_username> --mongo_password <mongo_password> ]')
+        print(usage_string)
         sys.exit(2)
     for opt, arg in opts:
         if opt == '-h':
-            print('mysql_to_mongo.py --sql_server <sql_server> --sql_username <sql_username> --sql_password <sql_password> --mongo_host <mongo_host> [ --mongo_username <mongo_username> --mongo_password <mongo_password> ]')
+            print(usage_string)
             sys.exit()
         elif opt == '--sql_server':
             sql_server = arg
@@ -87,7 +102,7 @@ def main(argv):
 
     if not all([sql_server, sql_username, sql_password, mongo_host]):
         print('missing one of requried args')
-        print('mysql_to_mongo.py --sql_server <sql_server> --sql_username <sql_username> --sql_password <sql_password> --mongo_host <mongo_host> [ --mongo_username <mongo_username> --mongo_password <mongo_password> ]')
+        print(usage_string)
         sys.exit()
 
     sql_port = 3306
