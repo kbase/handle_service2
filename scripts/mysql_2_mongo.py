@@ -80,7 +80,7 @@ def main(argv):
     sql_password = ''
     mongo_host = ''
     
-    usage_string = 'mysql_to_mongo.py --sql_server <sql_server> --sql_username <sql_username> --sql_password <sql_password> --mongo_host <mongo_host> [ --mongo_username <mongo_username> --mongo_password <mongo_password> ]'
+    usage_string = 'mysql_to_mongo.py --sql_server <sql_server> --sql_username <sql_username> --sql_password <sql_password> --mongo_host <mongo_host> [ --mongo_username <mongo_username> --mongo_password <mongo_password> [ --mongo_authmechanism <mongo_authmechanism> ] ]'
 
     try:
         opts, args = getopt.getopt(argv, "h", [a + '=' for a in input_args])
