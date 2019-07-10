@@ -185,7 +185,7 @@ def main(argv):
     print ('inserted {} records'.format(len(insert_result.inserted_ids)))
     doc_insert_list = []
 
-    maxId = my_collection.find_one( sort = [("_id", 1)]["_id"] )
+    maxId = my_collection.find_one( sort = [("_id", 1)] )["_id"]
     print ( maxId )
     
     counter_collection.delete_many({})
