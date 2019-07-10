@@ -139,6 +139,8 @@ def main(argv):
 
     insert_records = 0
     max_counter = 0
+    doc_insert_list = []
+
     for x in mycursor:
 #        print (x)
         doc = dict(zip(columns, x))
@@ -157,16 +159,22 @@ def main(argv):
         if counter > max_counter:
             max_counter = counter
 
-        if insert_one(my_collection, doc):
-            insert_records += 1
+        doc_insert_list.append(doc)
+        
+        if len(doc_insert_list) % 1000 == 0:
+            insert_result = my_collection.insert_many(doc_insert_list,ordered=False)
+            print (insert_result)
+            doc_insert_list = []
+#        if insert_one(my_collection, doc):
+#            insert_records += 1
 
-        if insert_records%5000 == 0:
-            print('hid {}, inserted {} records'.format(hid, insert_records))
+#       if insert_records%5000 == 0:
+#           print('hid {}, inserted {} records'.format(hid, insert_records))
 
     counter_collection.delete_many({})
     counter_collection.insert_one({'_id': 'hid_counter', 'hid_counter': max_counter + 1})
 
-    print('totally inserted {} records'.format(insert_records))
+#    print('totally inserted {} records'.format(insert_records))
     print('largest counter'.format(max_counter))
 
 
