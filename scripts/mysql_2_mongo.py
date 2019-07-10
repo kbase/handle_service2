@@ -2,8 +2,11 @@
 
 
 import mysql.connector
+
 from pymongo import MongoClient
 from pymongo.errors import ServerSelectionTimeoutError
+from pymongo.errors import BulkWriteError
+
 import traceback
 import sys
 import getopt
