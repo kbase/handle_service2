@@ -169,7 +169,7 @@ def main(argv):
                 insert_result = my_collection.insert_many(doc_insert_list,ordered=False)
             except BulkWriteError as bwe:
                 print(bwe.details)
-            print ('inserted {} records'.format(len(insert_result.inserted_ids)
+            print ('inserted {} records'.format(len(insert_result.inserted_ids)))
             doc_insert_list = []
 #        if insert_one(my_collection, doc):
 #            insert_records += 1
