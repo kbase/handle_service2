@@ -85,6 +85,7 @@ def main(argv):
     try:
         opts, args = getopt.getopt(argv, "h", [a + '=' for a in input_args])
     except getopt.GetoptError:
+        print('unrecognized option provided')
         print(usage_string)
         sys.exit(2)
     for opt, arg in opts:
