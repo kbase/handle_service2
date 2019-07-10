@@ -135,7 +135,6 @@ def main(argv):
     print('total MySQL record count: {}'.format(total_records))
 
     mycursor.execute("SELECT * FROM Handle")
-#    myresult = mycursor.fetchall()
 
     columns = ['hid', 'id', 'file_name', 'type', 'url', 'remote_md5', 'remote_sha1',
                'created_by', 'creation_date']
@@ -145,22 +144,9 @@ def main(argv):
     doc_insert_list = []
 
     for x in mycursor:
-#        print (x)
         doc = dict(zip(columns, x))
         hid = doc['hid']
         doc['_id'] = hid
-
-#        try:
-#            counter_str = hid.split('KBH_')[-1]
-#        except Exception:
-#            counter = hid
-#        try:
-#            counter = int(counter_str)
-#        except Exception:
-#            counter = 0
-#
-#        if counter > max_counter:
-#            max_counter = counter
 
         doc_insert_list.append(doc)
         
@@ -171,11 +157,6 @@ def main(argv):
                 print(bwe.details)
             print ('inserted {} records'.format(len(insert_result.inserted_ids)))
             doc_insert_list = []
-#        if insert_one(my_collection, doc):
-#            insert_records += 1
-
-#       if insert_records%5000 == 0:
-#           print('hid {}, inserted {} records'.format(hid, insert_records))
 
 # do one final bulk insert
     try:
@@ -192,7 +173,6 @@ def main(argv):
     counter_collection.delete_many({})
     counter_collection.insert_one({'_id': 'hid_counter', 'hid_counter': max_id + 1})
 
-#    print('totally inserted {} records'.format(insert_records))
     print('max id: {} '.format(max_id))
 
 
