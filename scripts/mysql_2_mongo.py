@@ -117,7 +117,7 @@ def main(argv):
     insert_records = 0
     max_counter = 0
     for x in mycursor:
-        print x
+        print (x)
         doc = dict(zip(columns, x))
         hid = doc['hid']
         doc['_id'] = hid
