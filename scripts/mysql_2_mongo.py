@@ -177,6 +177,15 @@ def main(argv):
 #       if insert_records%5000 == 0:
 #           print('hid {}, inserted {} records'.format(hid, insert_records))
 
+# do one final bulk insert
+    try:
+        insert_result = my_collection.insert_many(doc_insert_list,ordered=False)
+    except BulkWriteError as bwe:
+        print(bwe.details)
+    print ('inserted {} records'.format(len(insert_result.inserted_ids)))
+    doc_insert_list = []
+
+
     counter_collection.delete_many({})
     counter_collection.insert_one({'_id': 'hid_counter', 'hid_counter': max_counter + 1})
 
