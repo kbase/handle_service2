@@ -79,7 +79,10 @@ def main(argv):
     sql_username = ''
     sql_password = ''
     mongo_host = ''
-    
+    mongo_username = None
+    mongo_password = None
+    mongo_authmechanism = 'DEFAULT'
+
     usage_string = 'mysql_to_mongo.py --sql_server <sql_server> --sql_username <sql_username> --sql_password <sql_password> --mongo_host <mongo_host> [ --mongo_username <mongo_username> --mongo_password <mongo_password> [ --mongo_authmechanism <mongo_authmechanism> ] ]'
 
     try:
@@ -116,8 +119,8 @@ def main(argv):
     mongo_database = 'handle_db'
     mongo_collection = 'handle'
     mongo_counter_collection = 'handle_id_counter'
-    my_collection = connect_mongo(mongo_host, mongo_port, mongo_database, mongo_collection)
-    counter_collection = connect_mongo(mongo_host, mongo_port, mongo_database, mongo_counter_collection)
+    my_collection = connect_mongo(mongo_host, mongo_port, mongo_database, mongo_collection, mongo_username, mongo_password, mongo_authmechanism)
+    counter_collection = connect_mongo(mongo_host, mongo_port, mongo_database, mongo_counter_collection, mongo_username, mongo_password, mongo_authmechanism)
 
     mycursor.execute("SELECT COUNT(*) FROM Handle")
     myresult = mycursor.fetchall()
