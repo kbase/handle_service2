@@ -109,14 +109,14 @@ def main(argv):
     print('total MySQL record count: {}'.format(total_records))
 
     mycursor.execute("SELECT * FROM Handle")
-    myresult = mycursor.fetchall()
+#    myresult = mycursor.fetchall()
 
     columns = ['hid', 'id', 'file_name', 'type', 'url', 'remote_md5', 'remote_sha1',
                'created_by', 'creation_date']
 
     insert_records = 0
     max_counter = 0
-    for x in myresult:
+    for x in mycursor:
         doc = dict(zip(columns, x))
         hid = doc['hid']
         doc['_id'] = hid
