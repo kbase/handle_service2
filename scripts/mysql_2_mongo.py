@@ -22,12 +22,12 @@ def connect_mysql(sql_server, sql_username, sql_password, sql_database):
 
 
 def connect_mongo(mongo_host, mongo_port, mongo_database, mongo_collection,
-                  mongo_user=None, mongo_pass=None, mongo_authmechanism='DEFAULT'):
+                  mongo_username=None, mongo_password=None, mongo_authmechanism='DEFAULT'):
 
-    if mongo_user:
+    if mongo_username:
         print('mongo_user supplied, configuring client for authentication using mech ' + str(mongo_authmechanism) )
         my_client = MongoClient(mongo_host, mongo_port,
-                                username=mongo_user, password=mongo_password,
+                                username=mongo_username, password=mongo_password,
                                 authSource=mongo_database,
                                 authMechanism=mongo_authmechanism)
     else:
