@@ -150,17 +150,17 @@ def main(argv):
         hid = doc['hid']
         doc['_id'] = hid
 
-        try:
-            counter_str = hid.split('KBH_')[-1]
-        except Exception:
-            counter = hid
-        try:
-            counter = int(counter_str)
-        except Exception:
-            counter = 0
-
-        if counter > max_counter:
-            max_counter = counter
+#        try:
+#            counter_str = hid.split('KBH_')[-1]
+#        except Exception:
+#            counter = hid
+#        try:
+#            counter = int(counter_str)
+#        except Exception:
+#            counter = 0
+#
+#        if counter > max_counter:
+#            max_counter = counter
 
         doc_insert_list.append(doc)
         
@@ -185,14 +185,15 @@ def main(argv):
     print ('inserted {} records'.format(len(insert_result.inserted_ids)))
     doc_insert_list = []
 
-    maxId = my_collection.find_one( sort = [("_id", -1)] )["_id"]
-    print ( maxId )
+# get the max_id from the handle collection itself instead of from the mysql ids
+    max_id = my_collection.find_one( sort = [("_id", -1)] )["_id"]
+    print ( max_id )
     
     counter_collection.delete_many({})
-    counter_collection.insert_one({'_id': 'hid_counter', 'hid_counter': max_counter + 1})
+    counter_collection.insert_one({'_id': 'hid_counter', 'hid_counter': max_id + 1})
 
 #    print('totally inserted {} records'.format(insert_records))
-    print('largest counter'.format(max_counter))
+    print('max id: {} '.format(max_id))
 
 
 if __name__ == "__main__":
