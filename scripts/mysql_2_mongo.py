@@ -121,7 +121,11 @@ def main(argv):
         doc = dict(zip(columns, x))
         hid = doc['hid']
         doc['_id'] = hid
-        counter_str = hid.split('KBH_')[-1]
+
+        try:
+            counter_str = hid.split('KBH_')[-1]
+        except Exception:
+            counter = hid
         try:
             counter = int(counter_str)
         except Exception:
