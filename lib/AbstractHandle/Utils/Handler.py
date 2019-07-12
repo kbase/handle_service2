@@ -45,12 +45,15 @@ class Handler:
 
         handle['_id'] = handle.get('hid')  # assign _id to hid
 
-        required_fields = ['id', 'file_name', 'type', 'url']
+        required_fields = ['id', 'type', 'url']
         fields_values = [v for k, v in handle.items() if k in required_fields]
         if (len(fields_values) != len(required_fields)) or (not all(fields_values)):
             error_msg = 'Missing one or more required positional field\n'
             error_msg += 'Requried fields: {}'.format(required_fields)
             raise ValueError(error_msg)
+
+        if not handle.get('file_name'):  # assign None to remote_md5/remote_sha1 if missing/empty
+            handle['file_name'] = None
 
         if not handle.get('remote_md5'):  # assign None to remote_md5/remote_sha1 if missing/empty
             handle['remote_md5'] = None
