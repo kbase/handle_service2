@@ -17,3 +17,6 @@ admin-roles = {{ default .Env.admin_roles "HANDLE_ADMIN, KBASE_ADMIN" }}
 
 # The credential for the account approved to set shock node ACL. This account should be a shock admin.
 admin-token = {{ default .Env.admin_token "" }}
+
+# A prefix appended to handle id
+namespace = {{ default .Env.namespace "KBH" }}

@@ -115,7 +115,7 @@ class HandlerTest(unittest.TestCase):
         self.assertCountEqual(elements[:2], [h.get('hid') for h in handles])
 
         # test query 'hid' field with empty data
-        elements = [0]
+        elements = ['0']
         field_name = 'hid'
         handles = handler.fetch_handles_by({'elements': elements, 'field_name': field_name})
         self.assertEqual(len(handles), 0)
@@ -219,7 +219,8 @@ class HandlerTest(unittest.TestCase):
             hid = handler.persist_handle(handle, self.user_id)
             hids_to_delete.append(hid)
 
-        handles_to_delete = handler.fetch_handles_by({'elements': hids_to_delete, 'field_name': 'hid'})
+        handles_to_delete = handler.fetch_handles_by({'elements': hids_to_delete,
+                                                      'field_name': 'hid'})
 
         delete_count = handler.delete_handles(handles_to_delete, self.user_id)
 
