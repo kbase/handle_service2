@@ -14,8 +14,6 @@ from AbstractHandle.authclient import KBaseAuth as _KBaseAuth
 from AbstractHandle.Utils.MongoUtil import MongoUtil
 from AbstractHandle.Utils.Handler import Handler
 
-from installed_clients.WorkspaceClient import Workspace
-
 from mongo_util import MongoHelper
 
 
@@ -47,8 +45,6 @@ class handle_serviceTest(unittest.TestCase):
                              'method_params': []
                              }],
                         'authenticated': 1})
-        cls.wsURL = cls.cfg['workspace-url']
-        cls.wsClient = Workspace(cls.wsURL)
         cls.serviceImpl = AbstractHandle(cls.cfg)
         cls.scratch = cls.cfg['scratch']
         cls.callback_url = os.environ['SDK_CALLBACK_URL']
@@ -60,10 +56,6 @@ class handle_serviceTest(unittest.TestCase):
 
     @classmethod
     def tearDownClass(cls):
-        if hasattr(cls, 'wsName'):
-            cls.wsClient.delete_workspace({'workspace': cls.wsName})
-            print('Test workspace was deleted')
-
         if hasattr(cls, 'shock_ids_to_delete'):
             print('Nodes to delete: {}'.format(cls.shock_ids_to_delete))
             cls.deleteShockID(cls.shock_ids_to_delete)
@@ -78,18 +70,6 @@ class handle_serviceTest(unittest.TestCase):
                 print('Cannot detele shock node ' + shock_id)
             else:
                 print('Deleted shock node ' + shock_id)
-
-    def getWsClient(self):
-        return self.__class__.wsClient
-
-    def getWsName(self):
-        if hasattr(self.__class__, 'wsName'):
-            return self.__class__.wsName
-        suffix = int(time.time() * 1000)
-        wsName = "test_AbstractHandle_" + str(suffix)
-        ret = self.getWsClient().create_workspace({'workspace': wsName})  # noqa
-        self.__class__.wsName = wsName
-        return wsName
 
     def getImpl(self):
         return self.__class__.serviceImpl
