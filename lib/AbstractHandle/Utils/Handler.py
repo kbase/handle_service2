@@ -1,7 +1,6 @@
 
 import logging
 from time import gmtime, strftime
-import uuid
 import os
 import requests as _requests
 
@@ -41,9 +40,11 @@ class Handler:
         handle = {k: v for k, v in handle.items() if k in self.FIELD_NAMES}  # remove unnecessary fields
         if not handle.get('hid'):
             hid_counter = self.mongo_util.get_hid_counter()
-            handle['hid'] = 'KBH_' + str(hid_counter)
+            handle['hid'] = str(hid_counter)
+        else:
+            handle['hid'] = handle['hid'].split(self.namespace + '_')[-1]
 
-        handle['_id'] = handle.get('hid')  # assign _id to hid
+        handle['_id'] = int(handle['hid'])  # assign _id to 'hid'
 
         required_fields = ['id', 'type', 'url']
         fields_values = [v for k, v in handle.items() if k in required_fields]
@@ -101,6 +102,7 @@ class Handler:
         self.token_cache = TokenCache(1000, self.CACHE_EXPIRE_TIME)
         self.auth_url = config.get('auth-url')
         self.admin_roles = [role.strip() for role in config.get('admin-roles').split(',')]
+        self.namespace = config.get('namespace')
 
         logging.basicConfig(format='%(created)s %(levelname)s: %(message)s',
                             level=logging.INFO)
@@ -116,10 +118,16 @@ class Handler:
         elements = params.get('elements')
         field_name = params.get('field_name')
 
+        if field_name == 'hid':
+            # remove prefix for hids
+            elements = [hid.split(self.namespace + '_')[-1] for hid in elements]
+
         docs = self.mongo_util.find_in(elements, field_name)
 
         handles = list()
         for doc in docs:
+            # append prefix for returned hids
+            doc['hid'] = self.namespace + '_' + doc['hid']
             handles.append(doc)
 
         return handles
@@ -148,7 +156,7 @@ class Handler:
             # handle doesn't exist, insert handle
             self.mongo_util.insert_one(handle)
 
-        return str(hid)
+        return str(self.namespace + '_' + hid)
 
     def delete_handles(self, handles, user_id):
         """
@@ -162,6 +170,10 @@ class Handler:
         if not (handle_user == set([user_id])):
             raise ValueError('Cannot delete handles not created by owner')
 
+        # remove 'KBH_' prefix for hids
+        for handle in handles:
+            handle['hid'] = handle['hid'].split(self.namespace + '_')[-1]
+
         deleted_count = self.mongo_util.delete_many(handles)
 
         return deleted_count
@@ -170,6 +182,9 @@ class Handler:
         """
         check and see if token user is owner.username from shock node
         """
+
+        # remove 'KBH_' prefix for hids
+        hids = [hid.split(self.namespace + '_')[-1] for hid in hids]
 
         handles = self.fetch_handles_by({'elements': hids, 'field_name': 'hid'})
 
@@ -191,6 +206,9 @@ class Handler:
         check if nodes associated with handles is reachable/readable
         """
 
+        # remove 'KBH_' prefix for hids
+        hids = [hid.split(self.namespace + '_')[-1] for hid in hids]
+
         handles = self.fetch_handles_by({'elements': hids, 'field_name': 'hid'})
 
         for handle in handles:
@@ -211,6 +229,9 @@ class Handler:
         """
         grand readable acl for username or global if username is empty
         """
+
+        # remove 'KBH_' prefix for hids
+        hids = [hid.split(self.namespace + '_')[-1] for hid in hids]
 
         if not self._is_admin_user(token):
             raise ValueError('User may not run add_read_acl/set_public_read method')

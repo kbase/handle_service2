@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 import os
-import time
 import unittest
 from configparser import ConfigParser
 import inspect
@@ -108,7 +107,7 @@ class handle_serviceTest(unittest.TestCase):
         self.assertCountEqual(elements[:2], [h.get('hid') for h in handles])
 
         # test query 'hid' field with empty data
-        elements = [0]
+        elements = ['0']
         field_name = 'hid'
         handles = handler.fetch_handles_by(self.ctx, {'elements': elements, 'field_name': field_name})[0]
         self.assertEqual(len(handles), 0)
