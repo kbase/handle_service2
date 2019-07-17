@@ -146,7 +146,6 @@ def main(argv):
     for x in mycursor:
         doc = dict(zip(columns, x))
         hid = doc['hid']
-        doc['creation_date'] = str(doc['creation_date'])
         doc['_id'] = hid
 
         doc_insert_list.append(doc)
