@@ -135,8 +135,6 @@ class Handler:
         for doc in docs:
             # append prefix for returned hids
             doc['hid'] = self.namespace + '_' + str(doc['hid'])
-            print('fdasfsad')
-            print(doc)
             doc['creation_date'] = doc['creation_date'].timestamp()
             handles.append(doc)
 
