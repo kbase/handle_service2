@@ -1,8 +1,8 @@
 
 import logging
-from time import gmtime, strftime
 import os
 import requests as _requests
+import datetime
 
 from AbstractHandle.Utils.MongoUtil import MongoUtil
 from AbstractHandle.Utils.ShockUtil import ShockUtil
@@ -66,7 +66,7 @@ class Handler:
             handle['created_by'] = user_id
 
         if not handle.get('creation_date'):  # assign creation_date if missing
-            handle['creation_date'] = strftime("%Y-%m-%d %H:%M:%S", gmtime())
+            handle['creation_date'] = datetime.datetime.utcnow()
 
         return handle
 
