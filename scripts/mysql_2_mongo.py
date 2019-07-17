@@ -36,7 +36,7 @@ def connect_mongo(mongo_host, mongo_port, mongo_database, mongo_collection,
     else:
         print('no mongo_user supplied, connecting without auth')
         my_client = MongoClient(mongo_host, mongo_port)
-    
+
     try:
         my_client.server_info()  # force a call to server
     except ServerSelectionTimeoutError as e:
@@ -146,10 +146,11 @@ def main(argv):
     for x in mycursor:
         doc = dict(zip(columns, x))
         hid = doc['hid']
+        doc['creation_date'] = str(doc['creation_date'])
         doc['_id'] = hid
 
         doc_insert_list.append(doc)
-        
+
         if len(doc_insert_list) % 5000 == 0:
             try:
                 insert_result = my_collection.insert_many(doc_insert_list,ordered=False)
@@ -167,9 +168,9 @@ def main(argv):
     doc_insert_list = []
 
 # get the max_id from the handle collection itself instead of from the mysql ids
-    max_id = my_collection.find_one( sort = [("_id", -1)] )["_id"]
-    print ( max_id )
-    
+    max_id = my_collection.find_one(sort=[("_id", -1)])["_id"]
+    print (max_id)
+
     counter_collection.delete_many({})
     counter_collection.insert_one({'_id': 'hid_counter', 'hid_counter': max_id + 1})
 
