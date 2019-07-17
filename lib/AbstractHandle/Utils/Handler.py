@@ -128,6 +128,7 @@ class Handler:
         for doc in docs:
             # append prefix for returned hids
             doc['hid'] = self.namespace + '_' + str(doc['hid'])
+            doc['creation_date'] = str(doc['creation_date'])
             handles.append(doc)
 
         return handles
