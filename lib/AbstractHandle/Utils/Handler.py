@@ -68,6 +68,13 @@ class Handler:
         if not handle.get('creation_date'):  # assign creation_date if missing
             handle['creation_date'] = datetime.datetime.utcnow()
 
+        if not isinstance(handle['creation_date'], datetime.datetime):
+            # cast due to fetch_handles_by return epoch creation_date
+            try:
+                handle['creation_date'] = datetime.datetime.fromtimestamp(handle['creation_date'])
+            except Exception:
+                raise ValueError('Cannot convert creation_date field to datetime')
+
         return handle
 
     def _get_token_roles(self, token):
@@ -128,7 +135,9 @@ class Handler:
         for doc in docs:
             # append prefix for returned hids
             doc['hid'] = self.namespace + '_' + str(doc['hid'])
-            doc['creation_date'] = str(doc['creation_date'])
+            print('fdasfsad')
+            print(doc)
+            doc['creation_date'] = doc['creation_date'].timestamp()
             handles.append(doc)
 
         return handles
