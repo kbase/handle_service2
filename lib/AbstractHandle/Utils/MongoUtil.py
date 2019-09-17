@@ -58,13 +58,11 @@ class MongoUtil:
         return my_collection
 
     def _inc_counter(self):
-        counter = self.get_hid_counter()
 
-        counter += 1
+        query = {'_id': self.HID_COUNTER_ID}
+        update = {'$inc': {self.HID_COUNTER_ID: 1}}
 
-        update_filter = {'_id': self.HID_COUNTER_ID}
-        update = {'$set': {self.HID_COUNTER_ID: counter}}
-        self.hid_counter_collection.update_one(update_filter, update)
+        self.hid_counter_collection.find_and_modify(query=query, update=update)
 
     def __init__(self, config):
         self.mongo_host = config['mongo-host']
