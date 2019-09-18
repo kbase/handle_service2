@@ -167,7 +167,7 @@ class HandlerTest(unittest.TestCase):
         handles = handler.fetch_handles_by({'elements': [hid], 'field_name': 'hid'})
         self.assertEqual(len(handles), 1)
         handle = handles[0]
-        self.assertEqual(hid, 'KBH_' + str(counter))
+        self.assertEqual(hid, 'KBH_' + str(new_counter))
         self.assertEqual(handle.get('hid'), hid)
         self.assertEqual(handle.get('id'), 'id')
         self.assertEqual(handle.get('file_name'), 'file_name')
@@ -178,7 +178,7 @@ class HandlerTest(unittest.TestCase):
         with self.assertRaises(ValueError) as context:
             handler.persist_handle(new_handle, self.user_id)
 
-        self.assertIn('Connot insert doc', str(context.exception.args))
+        self.assertIn('Please do not specify hid', str(context.exception.args))
         self.mongo_util.delete_one(handle)
 
     def test_delete_handles_fail(self):

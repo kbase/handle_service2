@@ -1,6 +1,6 @@
 
 import logging
-from pymongo import MongoClient
+from pymongo import MongoClient, ReturnDocument
 from pymongo.errors import ServerSelectionTimeoutError
 import subprocess
 import traceback
@@ -57,14 +57,15 @@ class MongoUtil:
 
         return my_collection
 
-    def _inc_counter(self):
-        counter = self.get_hid_counter()
+    def increase_counter(self):
 
-        counter += 1
+        query = {'_id': self.HID_COUNTER_ID}
+        update = {'$inc': {self.HID_COUNTER_ID: 1}}
 
-        update_filter = {'_id': self.HID_COUNTER_ID}
-        update = {'$set': {self.HID_COUNTER_ID: counter}}
-        self.hid_counter_collection.update_one(update_filter, update)
+        return self.hid_counter_collection.find_one_and_update(filter=query,
+                                                               update=update,
+                                                               upsert=True,
+                                                               return_document=ReturnDocument.AFTER)['hid_counter']
 
     def __init__(self, config):
         self.mongo_host = config['mongo-host']
@@ -137,7 +138,6 @@ class MongoUtil:
 
         try:
             self.handle_collection.insert_one(doc)
-            self._inc_counter()
         except Exception as e:
             error_msg = 'Connot insert doc\n'
             error_msg += 'ERROR -- {}:\n{}'.format(
