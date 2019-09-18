@@ -38,11 +38,11 @@ class Handler:
         logging.info('start processing handle')
 
         handle = {k: v for k, v in handle.items() if k in self.FIELD_NAMES}  # remove unnecessary fields
-        if not handle.get('hid'):
-            hid_counter = self.mongo_util.get_hid_counter()
-            handle['hid'] = int(hid_counter)
+        if handle.get('hid'):
+            raise ValueError('Please do not specify hid. HandleService will auto-create a new hid.')
         else:
-            handle['hid'] = int(handle['hid'].split(self.namespace + '_')[-1])
+            hid_counter = self.mongo_util.increase_counter()
+            handle['hid'] = int(hid_counter)
 
         handle['_id'] = int(handle['hid'])  # assign _id to 'hid'
 

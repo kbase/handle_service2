@@ -4,6 +4,9 @@ import unittest
 from configparser import ConfigParser
 import inspect
 import copy
+import threading
+import queue
+from random import randrange
 
 from mongo_util import MongoHelper
 from AbstractHandle.Utils.MongoUtil import MongoUtil
@@ -123,7 +126,7 @@ class MongoUtilTest(unittest.TestCase):
         counter = mongo_util.get_hid_counter()
         mongo_util.insert_one(doc)
         new_counter = mongo_util.get_hid_counter()
-        self.assertEqual(new_counter, counter + 1)
+        self.assertEqual(new_counter, counter)
 
         self.assertEqual(mongo_util.handle_collection.find().count(), 11)
         elements = [9999]
@@ -135,6 +138,43 @@ class MongoUtilTest(unittest.TestCase):
 
         mongo_util.delete_one(doc)
         self.assertEqual(mongo_util.handle_collection.find().count(), 10)
+
+    def test_increase_counter_with_multi_threads(self):
+
+        mongo_util = self.getMongoUtil()
+        counter = mongo_util.get_hid_counter()
+
+        thread_count = 329
+
+        threads = list()
+        hids = list()
+        que = queue.Queue()
+        for index in range(thread_count):
+            x = threading.Thread(target=que.put(mongo_util.increase_counter()))
+            threads.append(x)
+            x.start()
+
+        for index, thread in enumerate(threads):
+            thread.join()
+
+        while not que.empty():
+            hids.append(que.get())
+
+        new_counter = mongo_util.get_hid_counter()
+        self.assertEqual(counter + thread_count, new_counter)
+
+        self.assertEqual(len(set(hids)), thread_count)
+        self.assertEqual(len(hids), len(set(hids)))
+
+        hids.sort()
+        self.assertEqual(hids[0], counter + 1)
+        self.assertEqual(hids[-1], new_counter)
+
+        rand_pos = randrange(thread_count)
+        self.assertEqual(hids[rand_pos], counter + 1 + rand_pos)
+
+        rand_pos = randrange(thread_count)
+        self.assertEqual(hids[-rand_pos], new_counter + 1 - rand_pos)
 
     def test_delete_one_ok(self):
         self.start_test()

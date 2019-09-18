@@ -6,6 +6,9 @@ import inspect
 import copy
 import requests as _requests
 from unittest.mock import patch
+import threading
+import queue
+from random import randrange
 
 from AbstractHandle.AbstractHandleImpl import AbstractHandle
 from AbstractHandle.AbstractHandleServer import MethodContext
@@ -156,21 +159,72 @@ class handle_serviceTest(unittest.TestCase):
         self.assertEqual(new_counter, counter + 1)
         handles = handler.fetch_handles_by(self.ctx, {'elements': [hid], 'field_name': 'hid'})[0]
         self.assertEqual(len(handles), 1)
-        handle = handles[0]
-        self.assertEqual(hid, 'KBH_' + str(counter))
-        self.assertEqual(handle.get('hid'), hid)
-        self.assertEqual(handle.get('id'), 'id')
-        self.assertEqual(handle.get('file_name'), 'file_name')
-        self.assertEqual(handle.get('created_by'), self.user_id)
+        handle_ret = handles[0]
+        self.assertEqual(hid, 'KBH_' + str(new_counter))
+        self.assertEqual(handle_ret.get('hid'), hid)
+        self.assertEqual(handle_ret.get('id'), 'id')
+        self.assertEqual(handle_ret.get('file_name'), 'file_name')
+        self.assertEqual(handle_ret.get('created_by'), self.user_id)
+
+        # testing persist_handle a second handle
+        hid = handler.persist_handle(self.ctx, handle)[0]
+        new_counter = self.mongo_util.get_hid_counter()
+        self.assertEqual(hid, 'KBH_' + str(new_counter))
+        self.assertEqual(new_counter, counter + 2)
 
         # testing persist_handle with existing handle (should not be allowed)
-        new_handle = copy.deepcopy(handle)
+        new_handle = copy.deepcopy(handle_ret)
         with self.assertRaises(ValueError) as context:
             handler.persist_handle(self.ctx, new_handle)[0]
 
-        self.assertIn('Connot insert doc', str(context.exception.args))
+        self.assertIn('Please do not specify hid', str(context.exception.args))
 
         self.mongo_util.delete_one(handle)
+
+    def test_persist_multiple_handles_ok(self):
+        self.start_test()
+        handler = self.getImpl()
+
+        handle = {'id': 'id',
+                  'file_name': 'file_name',
+                  'type': 'shock',
+                  'url': 'http://ci.kbase.us:7044/'}
+
+        counter = self.mongo_util.get_hid_counter()
+
+        thread_count = 257
+
+        threads = list()
+        hids = list()
+        que = queue.Queue()
+        for index in range(thread_count):
+            x = threading.Thread(target=lambda q, ctx, handle: q.put(handler.persist_handle(ctx, handle)),
+                                 args=(que, self.ctx, handle))
+            threads.append(x)
+            x.start()
+
+        for index, thread in enumerate(threads):
+            thread.join()
+
+        while not que.empty():
+            result = que.get()
+            hids.append(int(result[0].split('KBH_')[-1]))
+
+        new_counter = self.mongo_util.get_hid_counter()
+        self.assertEqual(counter + thread_count, new_counter)
+
+        self.assertEqual(len(set(hids)), thread_count)
+        self.assertEqual(len(hids), len(set(hids)))
+
+        hids.sort()
+        self.assertEqual(hids[0], counter + 1)
+        self.assertEqual(hids[-1], new_counter)
+
+        rand_pos = randrange(thread_count)
+        self.assertEqual(hids[rand_pos], counter + 1 + rand_pos)
+
+        rand_pos = randrange(thread_count)
+        self.assertEqual(hids[-rand_pos], new_counter + 1 - rand_pos)
 
     def test_delete_handles_ok(self):
         self.start_test()
