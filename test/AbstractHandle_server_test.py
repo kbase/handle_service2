@@ -165,7 +165,6 @@ class handle_serviceTest(unittest.TestCase):
 
         # testing persist_handle with existing handle (should not be allowed)
         new_handle = copy.deepcopy(handle)
-
         with self.assertRaises(ValueError) as context:
             handler.persist_handle(self.ctx, new_handle)[0]
 
