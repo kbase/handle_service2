@@ -107,6 +107,10 @@ class MongoUtil:
         else:
             return 0
 
+    def increase_counter(self):
+        self._inc_counter()
+        return self.get_hid_counter()
+
     def find_in(self, elements, field_name, projection={'_id': False}, batch_size=1000):
         """
         return cursor that contains docs which field column is in elements
@@ -135,7 +139,6 @@ class MongoUtil:
 
         try:
             self.handle_collection.insert_one(doc)
-            self._inc_counter()
         except Exception as e:
             error_msg = 'Connot insert doc\n'
             error_msg += 'ERROR -- {}:\n{}'.format(
