@@ -1,6 +1,6 @@
 
 import logging
-from pymongo import MongoClient
+from pymongo import MongoClient, ReturnDocument
 from pymongo.errors import ServerSelectionTimeoutError
 import subprocess
 import traceback
@@ -62,7 +62,9 @@ class MongoUtil:
         query = {'_id': self.HID_COUNTER_ID}
         update = {'$inc': {self.HID_COUNTER_ID: 1}}
 
-        return self.hid_counter_collection.find_and_modify(query=query, update=update)['hid_counter']
+        return self.hid_counter_collection.find_one_and_update(filter=query,
+                                                               update=update,
+                                                               return_document=ReturnDocument.BEFORE)['hid_counter']
 
     def __init__(self, config):
         self.mongo_host = config['mongo-host']
