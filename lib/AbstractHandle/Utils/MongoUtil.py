@@ -64,7 +64,8 @@ class MongoUtil:
 
         return self.hid_counter_collection.find_one_and_update(filter=query,
                                                                update=update,
-                                                               return_document=ReturnDocument.BEFORE)['hid_counter']
+                                                               upsert=True,
+                                                               return_document=ReturnDocument.AFTER)['hid_counter']
 
     def __init__(self, config):
         self.mongo_host = config['mongo-host']
