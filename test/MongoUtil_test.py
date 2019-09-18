@@ -163,6 +163,7 @@ class MongoUtilTest(unittest.TestCase):
         new_counter = mongo_util.get_hid_counter()
         self.assertEqual(counter + thread_count, new_counter)
 
+        self.assertEqual(len(set(hids)), thread_count)
         self.assertEqual(len(hids), len(set(hids)))
 
         hids.sort()

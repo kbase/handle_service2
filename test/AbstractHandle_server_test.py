@@ -169,6 +169,7 @@ class handle_serviceTest(unittest.TestCase):
         # testing persist_handle a second handle
         hid = handler.persist_handle(self.ctx, handle)[0]
         new_counter = self.mongo_util.get_hid_counter()
+        self.assertEqual(hid, 'KBH_' + str(new_counter))
         self.assertEqual(new_counter, counter + 2)
 
         # testing persist_handle with existing handle (should not be allowed)
@@ -212,6 +213,7 @@ class handle_serviceTest(unittest.TestCase):
         new_counter = self.mongo_util.get_hid_counter()
         self.assertEqual(counter + thread_count, new_counter)
 
+        self.assertEqual(len(set(hids)), thread_count)
         self.assertEqual(len(hids), len(set(hids)))
 
         hids.sort()
