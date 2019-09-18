@@ -157,7 +157,7 @@ class handle_serviceTest(unittest.TestCase):
         handles = handler.fetch_handles_by(self.ctx, {'elements': [hid], 'field_name': 'hid'})[0]
         self.assertEqual(len(handles), 1)
         handle = handles[0]
-        self.assertEqual(hid, 'KBH_' + str(counter))
+        self.assertEqual(hid, 'KBH_' + str(new_counter))
         self.assertEqual(handle.get('hid'), hid)
         self.assertEqual(handle.get('id'), 'id')
         self.assertEqual(handle.get('file_name'), 'file_name')

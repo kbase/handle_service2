@@ -123,7 +123,7 @@ class MongoUtilTest(unittest.TestCase):
         counter = mongo_util.get_hid_counter()
         mongo_util.insert_one(doc)
         new_counter = mongo_util.get_hid_counter()
-        self.assertEqual(new_counter, counter + 1)
+        self.assertEqual(new_counter, counter)
 
         self.assertEqual(mongo_util.handle_collection.find().count(), 11)
         elements = [9999]
