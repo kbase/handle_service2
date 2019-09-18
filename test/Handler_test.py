@@ -178,7 +178,7 @@ class HandlerTest(unittest.TestCase):
         with self.assertRaises(ValueError) as context:
             handler.persist_handle(new_handle, self.user_id)
 
-        self.assertIn('Connot insert doc', str(context.exception.args))
+        self.assertIn('Please do not specify hid', str(context.exception.args))
         self.mongo_util.delete_one(handle)
 
     def test_delete_handles_fail(self):

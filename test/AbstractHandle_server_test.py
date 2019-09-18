@@ -168,7 +168,7 @@ class handle_serviceTest(unittest.TestCase):
         with self.assertRaises(ValueError) as context:
             handler.persist_handle(self.ctx, new_handle)[0]
 
-        self.assertIn('Connot insert doc', str(context.exception.args))
+        self.assertIn('Please do not specify hid', str(context.exception.args))
 
         self.mongo_util.delete_one(handle)
 
