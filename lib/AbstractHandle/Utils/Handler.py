@@ -85,7 +85,7 @@ class Handler:
         resp = _requests.get(end_point, headers=headers)
 
         if resp.status_code != 200:
-            raise ValueError('Request owner failed.\nError Code: {}\n{}\n'
+            raise ValueError('Request auth roles.\nError Code: {}\n{}\n'
                              .format(resp.status_code, resp.text))
         else:
             data = resp.json()
@@ -152,17 +152,8 @@ class Handler:
         handle = self._process_handle(handle, user_id)
         hid = handle.get('hid')
 
-        docs = self.mongo_util.find_in([hid], 'hid')
-
-        if docs.count():
-            # handle exists, update handle
-            if handle.get('created_by') != user_id:
-                raise ValueError('Cannot update handle not created by owner')
-
-            self.mongo_util.update_one(handle)
-        else:
-            # handle doesn't exist, insert handle
-            self.mongo_util.insert_one(handle)
+        # handle doesn't exist, insert handle
+        self.mongo_util.insert_one(handle)
 
         return str(self.namespace + '_' + str(hid))
 

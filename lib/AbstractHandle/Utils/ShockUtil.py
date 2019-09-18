@@ -74,6 +74,8 @@ class ShockUtil:
         resp = _requests.get(end_point, headers=headers)
 
         if resp.status_code != 200:
+            logging.warning('get_owner failed with node_id: {} and token: {}\n'.format(node_id,
+                                                                                       token))
             raise ValueError('Request owner failed.\nError Code: {}\n{}\n'
                              .format(resp.status_code, resp.text))
         else:
