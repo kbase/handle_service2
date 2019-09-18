@@ -6,6 +6,7 @@ import inspect
 import copy
 import requests as _requests
 from unittest.mock import patch
+import threading
 
 from AbstractHandle.AbstractHandleImpl import AbstractHandle
 from AbstractHandle.AbstractHandleServer import MethodContext
@@ -171,6 +172,32 @@ class handle_serviceTest(unittest.TestCase):
         self.assertIn('Please do not specify hid', str(context.exception.args))
 
         self.mongo_util.delete_one(handle)
+
+    def test_persist_multiple_handles_ok(self):
+        self.start_test()
+        handler = self.getImpl()
+
+        handle = {'id': 'id',
+                  'file_name': 'file_name',
+                  'type': 'shock',
+                  'url': 'http://ci.kbase.us:7044/'}
+
+        counter = self.mongo_util.get_hid_counter()
+
+        thread_count = 17
+
+        threads = list()
+        for index in range(thread_count):
+            x = threading.Thread(target=handler.persist_handle, args=(self.ctx, handle))
+            threads.append(x)
+            x.start()
+
+        for index, thread in enumerate(threads):
+            thread.join()
+
+        new_counter = self.mongo_util.get_hid_counter()
+
+        self.assertEqual(counter + thread_count, new_counter)
 
     def test_delete_handles_ok(self):
         self.start_test()
