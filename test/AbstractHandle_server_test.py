@@ -184,7 +184,7 @@ class handle_serviceTest(unittest.TestCase):
 
         counter = self.mongo_util.get_hid_counter()
 
-        thread_count = 17
+        thread_count = 257
 
         threads = list()
         for index in range(thread_count):

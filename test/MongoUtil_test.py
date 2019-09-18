@@ -142,7 +142,7 @@ class MongoUtilTest(unittest.TestCase):
         mongo_util = self.getMongoUtil()
         counter = mongo_util.get_hid_counter()
 
-        thread_count = 10
+        thread_count = 329
 
         threads = list()
         for index in range(thread_count):
