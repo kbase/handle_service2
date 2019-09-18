@@ -57,12 +57,12 @@ class MongoUtil:
 
         return my_collection
 
-    def _inc_counter(self):
+    def increase_counter(self):
 
         query = {'_id': self.HID_COUNTER_ID}
         update = {'$inc': {self.HID_COUNTER_ID: 1}}
 
-        self.hid_counter_collection.find_and_modify(query=query, update=update)
+        return self.hid_counter_collection.find_and_modify(query=query, update=update)['hid_counter']
 
     def __init__(self, config):
         self.mongo_host = config['mongo-host']
@@ -106,10 +106,6 @@ class MongoUtil:
             return counter.next().get('hid_counter')
         else:
             return 0
-
-    def increase_counter(self):
-        self._inc_counter()
-        return self.get_hid_counter()
 
     def find_in(self, elements, field_name, projection={'_id': False}, batch_size=1000):
         """
