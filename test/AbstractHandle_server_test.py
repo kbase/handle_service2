@@ -163,26 +163,12 @@ class handle_serviceTest(unittest.TestCase):
         self.assertEqual(handle.get('file_name'), 'file_name')
         self.assertEqual(handle.get('created_by'), self.user_id)
 
-        # testing persist_handle with existing handle (updating a handle)
+        # testing persist_handle with existing handle (should not be allowed)
         new_handle = copy.deepcopy(handle)
-        new_file_name = 'new_file_name'
-        new_id = 'new_id'
-        new_handle['file_name'] = new_file_name
-        new_handle['id'] = new_id
-        counter = self.mongo_util.get_hid_counter()
-        new_hid = handler.persist_handle(self.ctx, new_handle)[0]
-        new_counter = self.mongo_util.get_hid_counter()
-        handles = handler.fetch_handles_by(self.ctx, {'elements': [new_hid], 'field_name': 'hid'})[0]
-        self.assertEqual(new_counter, counter)  # counter shouldn't increment
-        self.assertEqual(len(handles), 1)
-        handle = handles[0]
-        self.assertEqual(new_hid, 'KBH_' + str(counter-1))
-        self.assertEqual(handle.get('hid'), new_hid)
-        self.assertEqual(handle.get('id'), new_id)
-        self.assertEqual(handle.get('file_name'), new_file_name)
-        self.assertEqual(handle.get('created_by'), self.user_id)
+        with self.assertRaises(ValueError) as context:
+            handler.persist_handle(self.ctx, new_handle)[0]
 
-        self.assertEqual(new_hid, hid)
+        self.assertIn('Connot insert doc', str(context.exception.args))
 
         self.mongo_util.delete_one(handle)
 
