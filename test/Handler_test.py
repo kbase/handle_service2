@@ -243,6 +243,31 @@ class HandlerTest(unittest.TestCase):
         delete_count = handler.delete_handles(handles_to_delete, self.user_id)
         self.assertEqual(delete_count, len(hids))
 
+    def test_is_owner_fail(self):
+        self.start_test()
+        handler = self.getHandler()
+        node_id = self.createTestNode()
+
+        hids = list()
+
+        handle = {'id': node_id,
+                  'file_name': 'file_name',
+                  'type': 'not_shock',
+                  'url': self.shock_url}
+        hid = handler.persist_handle(handle, self.user_id)
+
+        hids.append(hid)
+
+        with self.assertRaises(ValueError) as context:
+            handler.is_owner(hids, self.token, self.user_id)
+
+        self.assertIn('Do not support node type other than Shock',
+                      str(context.exception.args))
+
+        handles_to_delete = handler.fetch_handles_by({'elements': hids, 'field_name': 'hid'})
+        delete_count = handler.delete_handles(handles_to_delete, self.user_id)
+        self.assertEqual(delete_count, len(hids))
+
     def test_are_readable_ok(self):
         self.start_test()
         handler = self.getHandler()
