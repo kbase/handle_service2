@@ -222,8 +222,16 @@ class HandlerTest(unittest.TestCase):
                   'file_name': 'file_name',
                   'type': 'shock',
                   'url': self.shock_url}
-        hid = handler.persist_handle(handle, self.user_id)
-        hids.append(hid)
+        hid_1 = handler.persist_handle(handle, self.user_id)
+
+        handle = {'id': node_id,
+                  'file_name': 'file_name',
+                  'type': 'SHOCK',
+                  'url': self.shock_url}
+        hid_2 = handler.persist_handle(handle, self.user_id)
+
+        hids.append(hid_1)
+        hids.append(hid_2)
 
         is_owner = handler.is_owner(hids, self.token, self.user_id)
         self.assertTrue(is_owner)
@@ -252,7 +260,7 @@ class HandlerTest(unittest.TestCase):
 
         handle = {'id': node_id_2,
                   'file_name': 'file_name',
-                  'type': 'shock',
+                  'type': 'Shock',
                   'url': self.shock_url}
         hid = handler.persist_handle(handle, self.user_id)
         hids.append(hid)
@@ -282,7 +290,7 @@ class HandlerTest(unittest.TestCase):
 
         handle = {'id': node_id,
                   'file_name': 'file_name',
-                  'type': 'shock',
+                  'type': 'SHOCK',
                   'url': self.shock_url}
         hid = handler.persist_handle(handle, self.user_id)
         hids.append(hid)

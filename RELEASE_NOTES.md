@@ -9,3 +9,8 @@
 1.0.1
 -----
 * Raise error if handle id exists when persist_handle is called.
+
+
+1.0.2
+-----
+* Make node type check non-case sensitive.

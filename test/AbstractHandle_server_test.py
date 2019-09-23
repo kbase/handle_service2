@@ -262,7 +262,7 @@ class handle_serviceTest(unittest.TestCase):
         node_id2 = self.createTestNode()
         handle = {'id': node_id2,
                   'file_name': 'file_name',
-                  'type': 'shock',
+                  'type': 'Shock',
                   'url': 'https://ci.kbase.us/services/shock-api'}
         hid = handler.persist_handle(self.ctx, handle)[0]
         hids.append(hid)
@@ -296,7 +296,7 @@ class handle_serviceTest(unittest.TestCase):
         node_id = self.createTestNode()
         handle = {'id': node_id,
                   'file_name': 'file_name',
-                  'type': 'shock',
+                  'type': 'SHOCK',
                   'url': 'https://ci.kbase.us/services/shock-api'}
         hid = handler.persist_handle(self.ctx, handle)[0]
         hids.append(hid)

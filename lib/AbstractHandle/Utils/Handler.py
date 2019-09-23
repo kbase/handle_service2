@@ -189,7 +189,7 @@ class Handler:
 
         for handle in handles:
             node_type = handle.get('type')
-            if node_type != 'shock':
+            if node_type.lower() != 'shock':
                 raise ValueError('Do not support node type other than Shock')
 
             node_id = handle.get('id')
@@ -212,7 +212,7 @@ class Handler:
 
         for handle in handles:
             node_type = handle.get('type')
-            if node_type != 'shock':
+            if node_type.lower() != 'shock':
                 raise ValueError('Do not support node type other than Shock')
 
             node_id = handle.get('id')
@@ -236,7 +236,7 @@ class Handler:
 
         for handle in handles:
             node_type = handle.get('type')
-            if node_type != 'shock':
+            if node_type.lower() != 'shock':
                 raise ValueError('Do not support node type other than Shock')
 
             node_id = handle.get('id')
