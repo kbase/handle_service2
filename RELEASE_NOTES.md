@@ -14,3 +14,7 @@
 1.0.2
 -----
 * Make node type check non-case sensitive.
+
+2.0.0
+-----
+* Incompatible change to support blobstore (https://github.com/kbase/blobstore) which no longer supports Shock.
