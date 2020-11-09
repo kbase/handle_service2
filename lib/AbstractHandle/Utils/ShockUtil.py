@@ -42,14 +42,14 @@ class ShockUtil:
 
     def _check_shock_conn(self, shock_url):
         end_point = self.shock_url + '/'
-        resp = _requests.put(end_point)
+        resp = _requests.get(end_point)
 
         if resp.status_code != 200:
             raise ValueError('Connot connect to shock server.\nError Code: {}\n{}\n'
                              .format(resp.status_code, resp.text))
         else:
             data = resp.json()
-            if data.get('type') != self.SERVER_TYPE or data.get('url') != end_point:
+            if data.get('id') != self.SERVER_TYPE:
                 raise ValueError('Unexpected response from shock server.\nError Code: {}\n{}\n'
                                  .format(resp.status_code, resp.text))
 
