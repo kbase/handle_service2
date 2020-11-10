@@ -14,3 +14,7 @@
 1.0.2
 -----
 * Make node type check non-case sensitive.
+
+1.0.3
+-----
+* Support blobstore (https://github.com/kbase/blobstore).
