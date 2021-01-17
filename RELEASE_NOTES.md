@@ -18,3 +18,4 @@
 1.0.3
 -----
 * Support blobstore (https://github.com/kbase/blobstore).
+* Switch to use Github action for tests.
