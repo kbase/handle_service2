@@ -6,6 +6,7 @@ import inspect
 import copy
 import requests as _requests
 from unittest.mock import patch
+import uuid
 
 from AbstractHandle.authclient import KBaseAuth as _KBaseAuth
 from mongo_util import MongoHelper
@@ -69,19 +70,27 @@ class HandlerTest(unittest.TestCase):
         print('\n*** starting test: ' + testname + ' **')
 
     def createTestNode(self):
+        curr_dir = os.path.dirname(os.path.abspath(__file__))
+        filename = 'mytestfile_{}'.format(str(uuid.uuid4()))
+
+        with open(os.path.join(curr_dir, filename), 'w') as f:
+            f.write('my test file!')
+
         headers = {'Authorization': 'OAuth {}'.format(self.token)}
 
-        end_point = os.path.join(self.shock_url, 'node')
+        end_point = os.path.join(self.shock_url, 'node?filename={}&format=text'.format(filename))
 
-        resp = _requests.post(end_point, headers=headers)
+        with open(filename, 'rb') as f:
+            resp = _requests.post(end_point, data=f, headers=headers)
 
-        if resp.status_code != 200:
-            raise ValueError('Grant user readable access failed.\nError Code: {}\n{}\n'
-                             .format(resp.status_code, resp.text))
-        else:
-            shock_id = resp.json().get('data').get('id')
-            self.shock_ids_to_delete.append(shock_id)
-            return shock_id
+            if resp.status_code != 200:
+                raise ValueError('Grant user readable access failed.\nError Code: {}\n{}\n'
+                                 .format(resp.status_code, resp.text))
+            else:
+                shock_id = resp.json().get('data').get('id')
+                self.shock_ids_to_delete.append(shock_id)
+
+        return shock_id
 
     def test_init_ok(self):
         self.start_test()
@@ -351,8 +360,8 @@ class HandlerTest(unittest.TestCase):
         new_users = [user.get('username') for user in data.get('data').get('read')]
         self.assertCountEqual(new_users, [self.user_id])
 
-        # grant access to tgu3
-        new_user = 'tgu3'
+        # grant access to kbasetest
+        new_user = 'kbasetest'
         handler.add_read_acl(hids, self.token, username=new_user)
         resp = _requests.get(end_point, headers=headers)
         data = resp.json()
