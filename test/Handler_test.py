@@ -360,8 +360,8 @@ class HandlerTest(unittest.TestCase):
         new_users = [user.get('username') for user in data.get('data').get('read')]
         self.assertCountEqual(new_users, [self.user_id])
 
-        # grant access to tgu3
-        new_user = 'tgu3'
+        # grant access to kbasetest
+        new_user = 'kbasetest'
         handler.add_read_acl(hids, self.token, username=new_user)
         resp = _requests.get(end_point, headers=headers)
         data = resp.json()
