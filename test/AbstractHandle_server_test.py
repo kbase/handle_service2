@@ -9,6 +9,7 @@ from unittest.mock import patch
 import threading
 import queue
 from random import randrange
+import uuid
 
 from AbstractHandle.AbstractHandleImpl import AbstractHandle
 from AbstractHandle.AbstractHandleServer import MethodContext
@@ -80,19 +81,27 @@ class handle_serviceTest(unittest.TestCase):
         return self.__class__.ctx
 
     def createTestNode(self):
+        curr_dir = os.path.dirname(os.path.abspath(__file__))
+        filename = 'mytestfile_{}'.format(str(uuid.uuid4()))
+
+        with open(os.path.join(curr_dir, filename), 'w') as f:
+            f.write('my test file!')
+
         headers = {'Authorization': 'OAuth {}'.format(self.token)}
 
-        end_point = os.path.join(self.shock_url, 'node')
+        end_point = os.path.join(self.shock_url, 'node?filename={}&format=text'.format(filename))
 
-        resp = _requests.post(end_point, headers=headers)
+        with open(filename, 'rb') as f:
+            resp = _requests.post(end_point, data=f, headers=headers)
 
-        if resp.status_code != 200:
-            raise ValueError('Grant user readable access failed.\nError Code: {}\n{}\n'
-                             .format(resp.status_code, resp.text))
-        else:
-            shock_id = resp.json().get('data').get('id')
-            self.shock_ids_to_delete.append(shock_id)
-            return shock_id
+            if resp.status_code != 200:
+                raise ValueError('Grant user readable access failed.\nError Code: {}\n{}\n'
+                                 .format(resp.status_code, resp.text))
+            else:
+                shock_id = resp.json().get('data').get('id')
+                self.shock_ids_to_delete.append(shock_id)
+
+        return shock_id
 
     def start_test(self):
         testname = inspect.stack()[1][3]
