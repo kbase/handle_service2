@@ -167,8 +167,8 @@ class ShockUtilTest(unittest.TestCase):
         new_users = [user.get('username') for user in data.get('data').get('read')]
         self.assertCountEqual(new_users, [self.user_id])
 
-        # grant access to tgu3 (Tian made this test so ^^)
-        new_user = 'tgu3'
+        # grant access to kbasetest
+        new_user = 'kbasetest'
         shock_util.add_read_acl(node_id, self.token, username=new_user)
         resp = _requests.get(end_point, headers=headers)
         data = resp.json()
