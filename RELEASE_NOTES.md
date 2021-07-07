@@ -19,3 +19,7 @@
 -----
 * Support blobstore (https://github.com/kbase/blobstore).
 * Switch to use Github action for tests.
+
+1.0.4
+-----
+* create index for 'hid' on startup to speed up fetching
