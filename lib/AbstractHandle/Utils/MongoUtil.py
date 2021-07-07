@@ -90,7 +90,7 @@ class MongoUtil:
                                                       self.mongo_user, self.mongo_pass,
                                                       self.mongo_authmechanism)
         # create index on startup to speed up fetching
-        self.handle_collection.create_index('hid')
+        self.handle_collection.create_index('hid', unique=True)
 
         self.hid_counter_collection = self._get_collection(self.mongo_host, self.mongo_port,
                                                            self.mongo_database,
