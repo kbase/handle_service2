@@ -23,3 +23,5 @@
 1.0.4
 -----
 * create index for 'hid' on startup to speed up fetching
+(NOTE: please add a unique index on hid in the background prior to upgrade or the service will hang on startup until the index is built.
+"db.handle.createIndex({hid:1},{unique:1,background:1})")
