@@ -241,7 +241,7 @@ class Handler:
 
             node_id = handle.get('id')
             try:
-                self.shock_util.add_read_acl(node_id, token, username=username)
+                self.shock_util.add_read_acl(node_id, username=username)
             except Exception:
                 raise ValueError("Unable to set acl(s) on handles {}".format(handle.get('hid')))
 
