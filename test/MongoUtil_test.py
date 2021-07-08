@@ -62,6 +62,12 @@ class MongoUtilTest(unittest.TestCase):
         self.assertEqual(handle_collection.name, 'handle')
         self.assertEqual(handle_collection.count_documents({}), 10)
 
+        handle_col_info = handle_collection.index_information()
+        handle_col_idx = handle_col_info.keys()
+        expected_idx = ['_id_', 'hid_1']
+        self.assertEqual(list(handle_col_idx), expected_idx)
+        self.assertTrue(handle_col_info['hid_1']['unique'])
+
         hid_counter_collection = mongo_util.hid_counter_collection
         self.assertEqual(hid_counter_collection.name, 'handle_id_counter')
 
