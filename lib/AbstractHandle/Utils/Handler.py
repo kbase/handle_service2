@@ -243,6 +243,5 @@ class Handler:
             try:
                 self.shock_util.add_read_acl(node_id, username=username)
             except Exception as e:
-                raise ValueError("Unable to set acl(s) on handles {}\n{}".format(handle.get('hid'),
-                                                                                 e))
+                raise ValueError("Unable to set acl(s) on handles {}".format(handle.get('hid'))) from e
         return 1
