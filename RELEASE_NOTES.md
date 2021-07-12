@@ -26,3 +26,4 @@
 (NOTE: please add a unique index on hid in the background prior to upgrade or the service will hang on startup until the index is built.
 "db.handle.createIndex({hid:1},{unique:1,background:1})")
 * use only admin token provided in the deploy.cfg file for `add_read_acl` operation.
+* Default `retryWrites` option to `False` with MongoClient creation (requires MongoDB 3.6+ to support this option)
