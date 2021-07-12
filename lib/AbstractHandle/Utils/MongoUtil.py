@@ -37,10 +37,11 @@ class MongoUtil:
             my_client = MongoClient(mongo_host, mongo_port,
                                     username=mongo_user, password=mongo_password,
                                     authSource=mongo_database,
-                                    authMechanism=mongo_authmechanism)
+                                    authMechanism=mongo_authmechanism,
+                                    retryWrites=False)
         else:
             logging.info('no mongo-user found in config file, connecting without auth')
-            my_client = MongoClient(mongo_host, mongo_port)
+            my_client = MongoClient(mongo_host, mongo_port, retryWrites=False)
 
         try:
             my_client.server_info()  # force a call to server
