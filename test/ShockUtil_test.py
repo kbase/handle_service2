@@ -149,19 +149,19 @@ class ShockUtilTest(unittest.TestCase):
         self.assertCountEqual(users, [self.user_id])
 
         # grant public read access
-        shock_util.add_read_acl(node_id, self.token)
+        shock_util.add_read_acl(node_id)
         resp = _requests.get(end_point, headers=headers)
         data = resp.json()
         self.assertTrue(data.get('data').get('public').get('read'))
 
         # should work for already publicly accessable ndoes
-        shock_util.add_read_acl(node_id, self.token)
+        shock_util.add_read_acl(node_id)
         resp = _requests.get(end_point, headers=headers)
         data = resp.json()
         self.assertTrue(data.get('data').get('public').get('read'))
 
         # test grant access to user who already has read access
-        shock_util.add_read_acl(node_id, self.token, username=self.user_id)
+        shock_util.add_read_acl(node_id, username=self.user_id)
         resp = _requests.get(end_point, headers=headers)
         data = resp.json()
         new_users = [user.get('username') for user in data.get('data').get('read')]
@@ -169,7 +169,7 @@ class ShockUtilTest(unittest.TestCase):
 
         # grant access to kbasetest
         new_user = 'kbasetest'
-        shock_util.add_read_acl(node_id, self.token, username=new_user)
+        shock_util.add_read_acl(node_id, username=new_user)
         resp = _requests.get(end_point, headers=headers)
         data = resp.json()
         new_users = [user.get('username') for user in data.get('data').get('read')]
