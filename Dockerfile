@@ -23,7 +23,8 @@ RUN echo "mongodb-org hold" | sudo dpkg --set-selections \
 
 RUN pip install pymongo==3.8.0 \
     && pip install mock==4.0.3 \
-    && pip install cachetools==4.2.2
+    && pip install cachetools==4.2.2 \
+    && pip install coverage==5.5
 
 
 # -----------------------------------------

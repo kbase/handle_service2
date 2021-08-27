@@ -1,0 +1,5 @@
+ignore:
+  - "lib/installed_clients"
+  - "lib/AbstractHandle/AbstractHandleServer.py"
+  - "lib/AbstractHandle/authclient.py"
+  - "lib/AbstractHandle/baseclient.py"
