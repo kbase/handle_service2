@@ -9,10 +9,11 @@ from unittest.mock import patch
 import uuid
 
 from AbstractHandle.authclient import KBaseAuth as _KBaseAuth
-from mongo_util import MongoHelper
 from AbstractHandle.Utils.Handler import Handler
 from AbstractHandle.Utils.MongoUtil import MongoUtil
 
+import mongo_util
+from mongo_controller import MongoController
 
 class HandlerTest(unittest.TestCase):
 
@@ -26,8 +27,6 @@ class HandlerTest(unittest.TestCase):
         for nameval in config.items('AbstractHandle'):
             cls.cfg[nameval[0]] = nameval[1]
         cls.cfg['admin-token'] = cls.token
-        cls.cfg['mongo-collection'] = 'handle'
-        cls.cfg['mongo-hid-counter-collection'] = 'handle_id_counter'
         cls.cfg['mongo-authmechanism'] = 'DEFAULT'
 
         # Getting username from Auth profile for token
@@ -35,10 +34,14 @@ class HandlerTest(unittest.TestCase):
         auth_client = _KBaseAuth(authServiceUrl)
         cls.user_id = auth_client.get_user(cls.token)
         cls.shock_url = cls.cfg['shock-url']
+        
+        mongo_exe, mongo_temp = mongo_util.get_mongo_info()
+        # TODO TEST allow testing with wired tiger on or off
+        cls.mongo_controller = MongoController(mongo_exe, mongo_temp, use_wired_tiger=False)
+        cls.cfg['mongo-host'] = "localhost"
+        cls.cfg["mongo-port"] = cls.mongo_controller.port
+        mongo_util.create_test_db(cls.mongo_controller, db=cls.cfg['mongo-database'])
 
-        cls.mongo_helper = MongoHelper()
-        cls.my_client = cls.mongo_helper.create_test_db(db=cls.cfg['mongo-database'],
-                                                        col=cls.cfg['mongo-collection'])
         cls.handler = Handler(cls.cfg)
         cls.mongo_util = MongoUtil(cls.cfg)
 
@@ -46,6 +49,9 @@ class HandlerTest(unittest.TestCase):
 
     @classmethod
     def tearDownClass(cls):
+        if hasattr(cls, "mongo_controller"):
+            # TODO TEST allow specifying whether test files should be destroyed
+            cls.mongo_controller.destroy(False)
         if hasattr(cls, 'shock_ids_to_delete'):
             print('Nodes to delete: {}'.format(cls.shock_ids_to_delete))
             cls.deleteShockID(cls.shock_ids_to_delete)
@@ -94,7 +100,9 @@ class HandlerTest(unittest.TestCase):
 
     def test_init_ok(self):
         self.start_test()
-        class_attri = ['mongo_util', 'shock_util', 'token_cache', 'auth_url', 'admin_roles']
+        class_attri = [
+            'mongo_util', 'shock_util', '_cache_lock', '_token_cache', 'auth_url', 'admin_roles'
+        ]
         handler = self.getHandler()
         self.assertTrue(set(class_attri) <= set(handler.__dict__.keys()))
 

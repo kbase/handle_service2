@@ -12,12 +12,12 @@ from random import randrange
 import uuid
 
 from AbstractHandle.AbstractHandleImpl import AbstractHandle
-from AbstractHandle.AbstractHandleServer import MethodContext
 from AbstractHandle.authclient import KBaseAuth as _KBaseAuth
-from AbstractHandle.Utils.MongoUtil import MongoUtil
+from AbstractHandle.Utils import MongoUtil
 from AbstractHandle.Utils.Handler import Handler
 
-from mongo_util import MongoHelper
+import mongo_util
+from mongo_controller import MongoController
 
 
 class handle_serviceTest(unittest.TestCase):
@@ -37,28 +37,38 @@ class handle_serviceTest(unittest.TestCase):
         auth_client = _KBaseAuth(authServiceUrl)
         cls.user_id = auth_client.get_user(cls.token)
         cls.shock_url = cls.cfg['shock-url']
-        # WARNING: don't call any logging methods on the context object,
-        # it'll result in a NoneType error
-        cls.ctx = MethodContext(None)
-        cls.ctx.update({'token': cls.token,
-                        'user_id': cls.user_id,
-                        'provenance': [
-                            {'service': 'AbstractHandle',
-                             'method': 'please_never_use_it_in_production',
-                             'method_params': []
-                             }],
-                        'authenticated': 1})
-        cls.serviceImpl = AbstractHandle(cls.cfg)
+        # Normally this is a AbstractHandleserver.MethodContext object. However, due to 10+ year
+        # old poor design, on import the server loads the config file and sets up the
+        # implementation object, which immediately tries to contact Mongo. We don't need the
+        # server for anything else and the context is only used as a simple dictionary in the
+        # Impl code and so got rid of the import.
+        cls.ctx = {'token': cls.token,
+                   'user_id': cls.user_id,
+                   'provenance': [
+                       {'service': 'AbstractHandle',
+                        'method': 'please_never_use_it_in_production',
+                        'method_params': []
+                       }
+                    ],
+                    'authenticated': 1
+        }
         cls.scratch = cls.cfg['scratch']
         cls.callback_url = os.environ['SDK_CALLBACK_URL']
-        cls.mongo_helper = MongoHelper()
-        cls.my_client = cls.mongo_helper.create_test_db(db=cls.cfg['mongo-database'],
-                                                        col=cls.cfg['mongo-collection'])
-        cls.mongo_util = MongoUtil(cls.cfg)
+        mongo_exe, mongo_temp = mongo_util.get_mongo_info()
+        # TODO TEST allow testing with wired tiger on or off
+        cls.mongo_controller = MongoController(mongo_exe, mongo_temp, use_wired_tiger=False)
+        cls.cfg['mongo-host'] = "localhost"
+        cls.cfg["mongo-port"] = cls.mongo_controller.port
+        mongo_util.create_test_db(cls.mongo_controller, db=cls.cfg['mongo-database'])
+        cls.serviceImpl = AbstractHandle(cls.cfg)
+        cls.mongo_util = MongoUtil.MongoUtil(cls.cfg)
         cls.shock_ids_to_delete = list()
 
     @classmethod
     def tearDownClass(cls):
+        if hasattr(cls, "mongo_controller"):
+            # TODO TEST allow specifying whether test files should be destroyed
+            cls.mongo_controller.destroy(False)
         if hasattr(cls, 'shock_ids_to_delete'):
             print('Nodes to delete: {}'.format(cls.shock_ids_to_delete))
             cls.deleteShockID(cls.shock_ids_to_delete)

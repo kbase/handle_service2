@@ -3,6 +3,7 @@ import logging
 import os
 import requests as _requests
 import datetime
+import threading
 
 from AbstractHandle.Utils.MongoUtil import MongoUtil
 from AbstractHandle.Utils.ShockUtil import ShockUtil
@@ -93,20 +94,23 @@ class Handler:
             return customroles
 
     def _is_admin_user(self, token):
-        fetched_token_info = self.token_cache.get(token)
+        with self._cache_lock:
+            fetched_token_info = self._token_cache.get(token)
 
         if fetched_token_info:
             customroles = fetched_token_info.get('customroles')
         else:
             customroles = self._get_token_roles(token)
-            self.token_cache[token] = {'customroles': customroles}
+            with self._cache_lock:
+                self._token_cache[token] = {'customroles': customroles}
 
         return not set(self.admin_roles).isdisjoint(customroles)
 
     def __init__(self, config):
         self.mongo_util = MongoUtil(config)
         self.shock_util = ShockUtil(config)
-        self.token_cache = TokenCache(1000, self.CACHE_EXPIRE_TIME)
+        self._cache_lock = threading.RLock()  # TokenCache / cachetools is not thread safe
+        self._token_cache = TokenCache(1000, self.CACHE_EXPIRE_TIME)
         self.auth_url = config.get('auth-url')
         self.admin_roles = [role.strip() for role in config.get('admin-roles').split(',')]
         self.namespace = config.get('namespace')
