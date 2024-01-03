@@ -11,16 +11,13 @@ MONGO_EXE_PATH="MONGO_EXE_PATH"
 MONGO_TEMP_DIR="MONGO_TEMP_DIR"
 
 
-def get_mongo_info() -> Tuple[str, Path]:
+def get_mongo_info() -> Tuple[Path, Path]:
     """
     Returns a tuple of
     * The path to the mongo executable from the environment
-    * the path to a directory consisting of a root directory taken from the environment appended
-      with a UUID.
+    * the path to a root directory for temporary mongo data from the environment.
     """
-    td = Path(os.environ.get(MONGO_TEMP_DIR)) / str(uuid.uuid4())
-    td.mkdir()
-    return (os.environ.get(MONGO_EXE_PATH), td)
+    return (Path(os.environ.get(MONGO_EXE_PATH)), Path(os.environ.get(MONGO_TEMP_DIR)))
 
 
 def _get_default_handles():
