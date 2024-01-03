@@ -8,8 +8,13 @@ import threading
 import queue
 from random import randrange
 
-from mongo_util import MongoHelper
 from AbstractHandle.Utils.MongoUtil import MongoUtil
+
+import mongo_util
+from mongo_controller import MongoController
+
+
+# TODO switch all tests to pytest, see sample_service for an example
 
 
 class MongoUtilTest(unittest.TestCase):
@@ -23,17 +28,21 @@ class MongoUtilTest(unittest.TestCase):
         for nameval in config.items('AbstractHandle'):
             cls.cfg[nameval[0]] = nameval[1]
 
-        cls.cfg['mongo-collection'] = 'handle'
-        cls.cfg['mongo-hid-counter-collection'] = 'handle_id_counter'
         cls.cfg['mongo-authmechanism'] = 'DEFAULT'
-
-        cls.mongo_helper = MongoHelper()
-        cls.my_client = cls.mongo_helper.create_test_db(db=cls.cfg['mongo-database'],
-                                                        col=cls.cfg['mongo-collection'])
+        
+        mongo_exe, mongo_temp = mongo_util.get_mongo_info()
+        # TODO TEST allow testing with wired tiger on or off
+        cls.mongo_controller = MongoController(mongo_exe, mongo_temp, use_wired_tiger=False)
+        cls.cfg['mongo-host'] = "localhost"
+        cls.cfg["mongo-port"] = cls.mongo_controller.port
+        mongo_util.create_test_db(cls.mongo_controller, db=cls.cfg['mongo-database'])
         cls.mongo_util = MongoUtil(cls.cfg)
 
     @classmethod
     def tearDownClass(cls):
+        if hasattr(cls, "mongo_controller"):
+            # TODO TEST allow specifying whether test files should be destroyed
+            cls.mongo_controller.destroy(False)
         print('Finished testing MongoUtil')
 
     def getMongoUtil(self):
@@ -53,8 +62,7 @@ class MongoUtilTest(unittest.TestCase):
 
     def test_init_ok(self):
         self.start_test()
-        class_attri = ['mongo_host', 'mongo_port', 'mongo_database', 'mongo_collection',
-                       'handle_collection', 'hid_counter_collection']
+        class_attri = ['mongo_host', 'mongo_port', 'mongo_database', 'handle_collection']
         mongo_util = self.getMongoUtil()
         self.assertTrue(set(class_attri) <= set(mongo_util.__dict__.keys()))
 
