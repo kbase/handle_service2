@@ -22,7 +22,7 @@ RUN apt-get install wget
 #                 example.
 
 WORKDIR /opt
-RUN wget -N https://github.com/kbase/dockerize/raw/master/dockerize-linux-amd64-v0.6.1.tar.gz \
+RUN wget -q https://github.com/kbase/dockerize/raw/master/dockerize-linux-amd64-v0.6.1.tar.gz \
     && tar xvzf dockerize-linux-amd64-v0.6.1.tar.gz \
     && rm dockerize-linux-amd64-v0.6.1.tar.gz
 RUN mkdir -p /kb/deployment/bin/
