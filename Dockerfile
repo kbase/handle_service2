@@ -1,4 +1,4 @@
-FROM kbase/sdkbase2:python
+FROM kbase/sdkpython:3.8.10
 MAINTAINER KBase Developer
 # -----------------------------------------
 # In this section, you can install any system dependencies required
@@ -6,25 +6,62 @@ MAINTAINER KBase Developer
 # install line here, a git checkout to download code, or run any other
 # installation scripts.
 
-# RUN apt-get update
+ RUN apt-get update
 
-# install mongodb
-RUN sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 2930ADAE8CAF5059EE73BB4B58712A2291FA4AD5 \
-    && echo "deb http://repo.mongodb.org/apt/debian stretch/mongodb-org/3.6 main" | sudo tee /etc/apt/sources.list.d/mongodb-org-3.6.list  \
-    && sudo apt-get update \
-    && sudo apt-get install -y mongodb-org=3.6.11 mongodb-org-server=3.6.11 mongodb-org-shell=3.6.11 mongodb-org-mongos=3.6.11 mongodb-org-tools=3.6.11 \
-    && sudo apt-get install -y mongodb
+# Longer term, we should completely redo the testing rig to allow for running tests without
+# kb-sdk. E.g. start up local instances of mongo, minio, auth, blobstore, and the handle service,
+# create users in auth, the whole shebang. See the workspace for how do to this.
 
-RUN echo "mongodb-org hold" | sudo dpkg --set-selections \
-    && echo "mongodb-org-server hold" | sudo dpkg --set-selections \
-    && echo "mongodb-org-shell hold" | sudo dpkg --set-selections \
-    && echo "mongodb-org-mongos hold" | sudo dpkg --set-selections \
-    && echo "mongodb-org-tools hold" | sudo dpkg --set-selections
+RUN apt-get install wget
 
-RUN pip install pymongo==3.8.0 \
-    && pip install mock==4.0.3 \
-    && pip install cachetools==4.2.2
+#####################
+### install dockerize
+#####################
 
+# TODO DOCKERFILE switch from dockerize to rancher env driven config. See collections for an
+#                 example.
+
+WORKDIR /opt
+RUN wget -q https://github.com/kbase/dockerize/raw/master/dockerize-linux-amd64-v0.6.1.tar.gz \
+    && tar xvzf dockerize-linux-amd64-v0.6.1.tar.gz \
+    && rm dockerize-linux-amd64-v0.6.1.tar.gz
+RUN mkdir -p /kb/deployment/bin/
+RUN ln -s /opt/dockerize /kb/deployment/bin/dockerize
+
+###################
+### install mongodb
+###################
+
+# TODO Set things up so we can test against multiple versions of Mongo in GHA. This might work?
+ENV MONGO_VER=mongodb-linux-x86_64-3.6.23
+
+RUN mkdir -p /mongo/tmpdata
+WORKDIR /mongo
+RUN wget -q http://fastdl.mongodb.org/linux/$MONGO_VER.tgz
+RUN tar xfz $MONGO_VER.tgz && rm $MONGO_VER.tgz
+ENV MONGO_EXE_PATH=/mongo/$MONGO_VER/bin/mongod
+ENV MONGO_TEMP_DIR=/mongo/tmpdata
+RUN echo $MONGO_EXE_PATH
+RUN echo $MONGO_TEMP_DIR
+RUN $MONGO_EXE_PATH --version
+
+#######################
+### Install python deps
+#######################
+
+RUN conda config --add channels conda-forge
+# uwsgi install fails with pip due to some kind of incompatibility with conda
+# note this step takes FOREVER
+# should probably try to get rid of conda, it's a nightmare to deal with
+RUN conda install -y uwsgi=2.0.22
+
+# Conda fails to install these due to what appears to be an overly strict dependency graph solver
+RUN pip install \
+        pymongo==3.8.0 \
+        mock==4.0.3 \
+        cachetools==4.2.2 \
+        coverage==5.5 \
+        semver==3.0.2
 
 # -----------------------------------------
 

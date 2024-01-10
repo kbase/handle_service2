@@ -5,26 +5,12 @@ from pymongo.errors import ServerSelectionTimeoutError
 import subprocess
 import traceback
 
+MONGO_COLLECTION = 'handle'
+MONGO_HID_COUNTER_COLLECTION = 'handle_id_counter'
 
 class MongoUtil:
 
-    HID_COUNTER_ID = 'hid_counter'
-
-    def _start_local_service(self):
-        logging.info('starting local mongod service')
-
-        logging.info('running sudo service mongodb start')
-        pipe = subprocess.Popen("sudo service mongodb start", shell=True, stdout=subprocess.PIPE,
-                                stderr=subprocess.PIPE)
-        stdout, stderr = pipe.communicate()
-        logging.info(stdout)
-
-        logging.info('running mongod --version')
-        pipe = subprocess.Popen("mongod --version", shell=True, stdout=subprocess.PIPE,
-                                stderr=subprocess.PIPE)
-        stdout, stderr = pipe.communicate()
-
-        logging.info(stdout)
+    _HID_COUNTER_ID = 'hid_counter'
 
     def _get_collection(self, mongo_host, mongo_port, mongo_database, mongo_collection,
                         mongo_user=None, mongo_password=None, mongo_authmechanism='DEFAULT'):
@@ -59,8 +45,8 @@ class MongoUtil:
 
     def increase_counter(self):
 
-        query = {'_id': self.HID_COUNTER_ID}
-        update = {'$inc': {self.HID_COUNTER_ID: 1}}
+        query = {'_id': self._HID_COUNTER_ID}
+        update = {'$inc': {self._HID_COUNTER_ID: 1}}
 
         return self.hid_counter_collection.find_one_and_update(filter=query,
                                                                update=update,
@@ -75,18 +61,8 @@ class MongoUtil:
         self.mongo_pass = config['mongo-password']
         self.mongo_authmechanism = config['mongo-authmechanism']
 
-        self.mongo_collection = config['mongo-collection']
-        self.mongo_hid_counter_collection = config['mongo-hid-counter-collection']
-
-        try:
-            start_local = int(config.get('start-local-mongo', 1))
-        except Exception:
-            start_local = 1
-        if start_local:
-            self._start_local_service()
-
         self.handle_collection = self._get_collection(self.mongo_host, self.mongo_port,
-                                                      self.mongo_database, self.mongo_collection,
+                                                      self.mongo_database, MONGO_COLLECTION,
                                                       self.mongo_user, self.mongo_pass,
                                                       self.mongo_authmechanism)
         # create index on startup to speed up fetching
@@ -94,7 +70,7 @@ class MongoUtil:
 
         self.hid_counter_collection = self._get_collection(self.mongo_host, self.mongo_port,
                                                            self.mongo_database,
-                                                           self.mongo_hid_counter_collection,
+                                                           MONGO_HID_COUNTER_COLLECTION,
                                                            self.mongo_user, self.mongo_pass,
                                                            self.mongo_authmechanism)
 
@@ -105,7 +81,7 @@ class MongoUtil:
         """
         get current handle id counter
         """
-        counter = self.hid_counter_collection.find({'_id': {'$eq': self.HID_COUNTER_ID}})
+        counter = self.hid_counter_collection.find({'_id': {'$eq': self._HID_COUNTER_ID}})
 
         if counter.count():
             return counter.next().get('hid_counter')
