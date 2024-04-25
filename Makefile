@@ -1,7 +1,7 @@
 SERVICE = AbstractHandle
 SERVICE_CAPS = AbstractHandle
 SPEC_FILE = handle_service.spec
-URL = https://kbase.us/services/handle_service
+URL = https://ci.kbase.us/services/handle_service
 DIR = $(shell pwd)
 LIB_DIR = lib
 SCRIPTS_DIR = scripts
@@ -20,9 +20,17 @@ all: compile build build-startup-script build-executable-script build-test-scrip
 
 compile:
 	kb-sdk compile $(SPEC_FILE) \
+		--out . \
+		--html
+	kb-sdk compile $(SPEC_FILE) \
 		--out $(LIB_DIR) \
 		--pysrvname $(SERVICE_CAPS).$(SERVICE_CAPS)Server \
 		--pyimplname $(SERVICE_CAPS).$(SERVICE_CAPS)Impl;
+	kb-sdk compile $(SPEC_FILE) \
+		--out . \
+		--java \
+		--url $(URL) \
+		--javasrc src/main/java
 
 build:
 	chmod +x $(SCRIPTS_DIR)/entrypoint.sh
