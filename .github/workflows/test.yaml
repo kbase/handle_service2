@@ -58,6 +58,7 @@ jobs:
     - name: Run tests
       shell: bash
       run: |
+        export PYTHONPATH=lib:$PYTHONPATH
         export HANDLE_SERVICE_TEST_CFG=`pwd`/test.cfg
         coverage run -m unittest discover -p "*_test.py"
         coverage xml
