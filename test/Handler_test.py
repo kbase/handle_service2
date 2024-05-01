@@ -35,9 +35,9 @@ class HandlerTest(unittest.TestCase):
         cls.user_id = auth_client.get_user(cls.token)
         cls.shock_url = cls.cfg['shock-url']
         
-        mongo_exe, mongo_temp = mongo_util.get_mongo_info()
+        mongo_exe, mongo_temp, use_wired_tiger, delete_temp_dir = mongo_util.get_mongo_info()
         # TODO TEST allow testing with wired tiger on or off
-        cls.mongo_controller = MongoController(mongo_exe, mongo_temp, use_wired_tiger=False)
+        cls.mongo_controller = MongoController(mongo_exe, mongo_temp, use_wired_tiger)
         cls.cfg['mongo-host'] = "localhost"
         cls.cfg["mongo-port"] = cls.mongo_controller.port
         mongo_util.create_test_db(cls.mongo_controller, db=cls.cfg['mongo-database'])

@@ -1,0 +1,15 @@
+[HandleService2]
+
+# the path to the MongoDB executable to use.
+test.mongo.exe=mongod
+
+# whether to use the wired tiger storage engine for MongoDB. 'true' means yes, anything else means
+# no.
+test.mongo.wired_tiger=false
+
+# Where to store temporary files generated during the test.
+test.temp.dir=temp_test_dir
+
+# Whether test files should be discarded after testing is complete.
+# Anything other than 'false' is considered true.
+test.delete.temp.dir=true

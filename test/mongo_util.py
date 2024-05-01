@@ -1,24 +1,58 @@
 import logging
 import os
-import uuid
 from pathlib import Path
 from typing import Tuple
+from configparser import ConfigParser
 from datetime import datetime
 from mongo_controller import MongoController
 from AbstractHandle.Utils import MongoUtil
 
-MONGO_EXE_PATH="MONGO_EXE_PATH"
-MONGO_TEMP_DIR="MONGO_TEMP_DIR"
+TEST_CONFIG_PATH = "HANDLE_SERVICE_TEST_CFG"
+TEST_SECTION = "HandleService2"
+TEST_MONGO_EXE = "test.mongo.exe"
+TEST_TEMP_DIR = "test.temp.dir"
+TEST_USE_WIRED_TIGER = "test.mongo.wired_tiger"
+TEST_DELETE_TEMP_DIR = "test.delete.temp.dir"
 
-
-def get_mongo_info() -> Tuple[Path, Path]:
+def get_config() -> Tuple[Path, Path, bool, bool]:
     """
-    Returns a tuple of
-    * The path to the mongo executable from the environment
-    * the path to a root directory for temporary mongo data from the environment.
+    Returns:
+        The path to the mongo executable from the environment
+        The path to a root directory for temporary mongo data from the environment
+        Whether to use the wired tiger storage engine for MongoDB
+        Whether test files should be discarded after testing is complete
     """
-    return (Path(os.environ.get(MONGO_EXE_PATH)), Path(os.environ.get(MONGO_TEMP_DIR)))
+    config_path = _get_config_file_path()
+    section = _get_test_config(config_path)
+    mongo_exe_path = _get_value(section, TEST_MONGO_EXE, config_path, True)
+    mongo_temp_dir = _get_value(section, TEST_TEMP_DIR, config_path, True)
+    wired_tiger = _get_value(section, TEST_USE_WIRED_TIGER, config_path, False)
+    delete_temp_dir = _get_value(section, TEST_DELETE_TEMP_DIR, config_path, False)
+    return mongo_exe_path, mongo_temp_dir, wired_tiger=="true", delete_temp_dir!="false"
 
+def _get_config_file_path() -> str:
+    config_path = os.environ.get(TEST_CONFIG_PATH)
+    if not config_path:
+        raise ValueError(
+            f"Must supply absolute path to test config file in {TEST_CONFIG_PATH} environment variable"
+        )
+    return config_path
+
+def _get_test_config(config_path) -> dict[str, str]:
+    cfg = dict()
+    config = ConfigParser()
+    config.read(config_path)
+    for key, val in config.items(TEST_SECTION):
+        cfg[key] = val
+    return config
+
+def _get_value(section, key, path, required) -> str:
+    val = section.get(key, "").strip()
+    if val == "" and required:
+        raise ValueError(
+            f"Required key {key} in section {TEST_SECTION} in config file {path} is missing a value"
+		)
+    return val
 
 def _get_default_handles():
 
