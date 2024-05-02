@@ -1,8 +1,11 @@
 import logging
 import os
-from typing import List, Tuple
+
 from configparser import ConfigParser
 from datetime import datetime
+from pathlib import Path
+from typing import List, Tuple, Union
+
 from mongo_controller import MongoController
 from AbstractHandle.Utils import MongoUtil
 
@@ -22,7 +25,7 @@ TEST_ADMIN_TOKEN = "admin-token"
 TEST_ADMIN_ROLES = "admin-roles"
 TEST_NAME_SPACE = "namespace"
 
-def get_config() -> Tuple[List[str], dict[str, str]]:
+def get_config() -> Tuple[List[Union[Path, bool]], dict[str, str]]:
     """
     Returns:
         Mongo config that stores mongo executable, temporary directory, wired_tiger, and delete_temp_dir
@@ -44,8 +47,8 @@ def get_config() -> Tuple[List[str], dict[str, str]]:
     name_space = _get_value(section, TEST_NAME_SPACE, config_path, True)
 
     mongo_config = [
-        mongo_exe_path,
-        mongo_temp_dir,
+        Path(mongo_exe_path),
+        Path(mongo_temp_dir),
         wired_tiger=="true",
         delete_temp_dir!="false",
     ]
