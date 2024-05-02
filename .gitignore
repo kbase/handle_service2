@@ -5,3 +5,9 @@ lib/AbstractHandle/AbstractHandleImpl.py.bak*
 /.project
 __pycache__
 /.pydevproject
+
+# Ignore Gradle project-specific cache directory
+.gradle
+
+# Ignore Gradle build output directory
+build
