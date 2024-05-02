@@ -75,10 +75,9 @@ def _get_test_config(config_path) -> dict[str, str]:
     config.read(config_path)
     for key, val in config.items(TEST_SECTION):
         cfg[key] = val
-    return config
+    return cfg
 
 def _get_value(section, key, path, required) -> str:
-    print(f"section is: {section}")
     val = section.get(key, "").strip()
     if val == "" and required:
         raise ValueError(
