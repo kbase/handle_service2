@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 import os
 import unittest
-from configparser import ConfigParser
 import inspect
 import copy
 import requests as _requests
@@ -19,25 +18,20 @@ class HandlerTest(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        cls.token = os.environ.get('KB_AUTH_TOKEN', None)
-        config_file = os.environ.get('KB_DEPLOYMENT_CONFIG', None)
-        cls.cfg = {}
-        config = ConfigParser()
-        config.read(config_file)
-        for nameval in config.items('AbstractHandle'):
-            cls.cfg[nameval[0]] = nameval[1]
-        cls.cfg['admin-token'] = cls.token
-        cls.cfg['mongo-authmechanism'] = 'DEFAULT'
+        mongo_config, deploy_config = mongo_util.get_config()
+        cls.cfg = deploy_config
+        cls.token = deploy_config['admin-token']
 
+        cls.cfg['mongo-authmechanism'] = 'DEFAULT'
         # Getting username from Auth profile for token
         authServiceUrl = cls.cfg['auth-service-url']
         auth_client = _KBaseAuth(authServiceUrl)
         cls.user_id = auth_client.get_user(cls.token)
         cls.shock_url = cls.cfg['shock-url']
-        
-        mongo_exe, mongo_temp, use_wired_tiger, delete_temp_dir = mongo_util.get_mongo_info()
+
         # TODO TEST allow testing with wired tiger on or off
-        cls.mongo_controller = MongoController(mongo_exe, mongo_temp, use_wired_tiger)
+        mongo_exe, mongo_temp, use_wired_tiger, delete_temp_dir = mongo_config
+        cls.mongo_controller = MongoController(mongo_exe, mongo_temp, use_wired_tiger=use_wired_tiger)
         cls.cfg['mongo-host'] = "localhost"
         cls.cfg["mongo-port"] = cls.mongo_controller.port
         mongo_util.create_test_db(cls.mongo_controller, db=cls.cfg['mongo-database'])

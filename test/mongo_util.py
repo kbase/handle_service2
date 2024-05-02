@@ -1,12 +1,12 @@
 import logging
 import os
-from pathlib import Path
-from typing import Tuple
+from typing import List, Tuple
 from configparser import ConfigParser
 from datetime import datetime
 from mongo_controller import MongoController
 from AbstractHandle.Utils import MongoUtil
 
+# Mongo config
 TEST_CONFIG_PATH = "HANDLE_SERVICE_TEST_CFG"
 TEST_SECTION = "HandleService2"
 TEST_MONGO_EXE = "test.mongo.exe"
@@ -14,21 +14,52 @@ TEST_TEMP_DIR = "test.temp.dir"
 TEST_USE_WIRED_TIGER = "test.mongo.wired_tiger"
 TEST_DELETE_TEMP_DIR = "test.delete.temp.dir"
 
-def get_config() -> Tuple[Path, Path, bool, bool]:
+# Deploy config
+TEST_AUTH_SERVICE_URL = "auth-service-url"
+TEST_AUTH_URL = "auth-url"
+TEST_SHOCK_URL = "shock-url"
+TEST_ADMIN_TOKEN = "admin-token"
+TEST_ADMIN_ROLES = "admin-roles"
+TEST_NAME_SPACE = "namespace"
+
+def get_config() -> Tuple[List[str], dict[str, str]]:
     """
     Returns:
-        The path to the mongo executable from the environment
-        The path to a root directory for temporary mongo data from the environment
-        Whether to use the wired tiger storage engine for MongoDB
-        Whether test files should be discarded after testing is complete
+        Mongo config that stores mongo executable, temporary directory, wired_tiger, and delete_temp_dir
+        Deploy config that stores auther_serice_url, auth_url, shock_url, admin_token, admin_roles, and namespace
     """
     config_path = _get_config_file_path()
     section = _get_test_config(config_path)
+
     mongo_exe_path = _get_value(section, TEST_MONGO_EXE, config_path, True)
     mongo_temp_dir = _get_value(section, TEST_TEMP_DIR, config_path, True)
     wired_tiger = _get_value(section, TEST_USE_WIRED_TIGER, config_path, False)
     delete_temp_dir = _get_value(section, TEST_DELETE_TEMP_DIR, config_path, False)
-    return mongo_exe_path, mongo_temp_dir, wired_tiger=="true", delete_temp_dir!="false"
+
+    auth_serivce_url = _get_value(section, TEST_AUTH_SERVICE_URL, config_path, True)
+    auth_url = _get_value(section, TEST_AUTH_URL, config_path, True)
+    shock_url = _get_value(section, TEST_SHOCK_URL, config_path, True)
+    admin_token = _get_value(section, TEST_ADMIN_TOKEN, config_path, True)
+    admin_roles = _get_value(section, TEST_ADMIN_ROLES, config_path, True)
+    name_space = _get_value(section, TEST_NAME_SPACE, config_path, True)
+
+    mongo_config = [
+        mongo_exe_path,
+        mongo_temp_dir,
+        wired_tiger=="true",
+        delete_temp_dir!="false",
+    ]
+
+    deploy_config = {
+        TEST_AUTH_SERVICE_URL: auth_serivce_url,
+        TEST_AUTH_URL: auth_url,
+        TEST_SHOCK_URL: shock_url,
+        TEST_ADMIN_TOKEN: admin_token,
+        TEST_ADMIN_ROLES: admin_roles,
+        TEST_NAME_SPACE: name_space,
+    }
+
+    return mongo_config, deploy_config
 
 def _get_config_file_path() -> str:
     config_path = os.environ.get(TEST_CONFIG_PATH)

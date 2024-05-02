@@ -36,6 +36,13 @@ jobs:
 
     - name: Install dependencies and set up test config
       shell: bash
+      env:
+        AUTH_SERVICE_URL: https://ci.kbase.us/services/auth/api/legacy/KBase/Sessions/Login
+        AUTH_URL: https://ci.kbase.us/services/auth
+        SHOCK_URL: https://ci.kbase.us/services/shock-api
+        ADMIN_TOKEN: ${{ secrets.KBASE_TEST_TOKEN }}
+        ADMIN_ROLES: HANDLE_ADMIN, KBASE_ADMIN
+        NAME_SPACE: KBH
       run: |
 
         # install python libraries
@@ -53,12 +60,19 @@ jobs:
         sed -i "s#^test.temp.dir =.*#test.temp.dir=temp_test_dir#" test.cfg
         sed -i "s#^test.mongo.exe.*#test.mongo.exe=$MONGOD#" test.cfg
         sed -i "s#^test.mongo.wired_tiger.*#test.mongo.wired_tiger=${{matrix.wired_tiger}}#" test.cfg
+
+        sed -i "s#^auth-service-url.*#auth-service-url=$AUTH_SERVICE_URL#" test.cfg
+        sed -i "s#^auth-url.*#auth-url=$AUTH_URL#" test.cfg
+        sed -i "s#^shock-url.*#shock-url=$SHOCK_URL#" test.cfg
+        sed -i "s#^admin-token.*#admin-token=$ADMIN_TOKEN#" test.cfg
+        sed -i "s#^admin-roles.*#admin-roles=$ADMIN_ROLES#" test.cfg
+        sed -i "s#^namespace.*#namespace=$NAME_SPACE#" test.cfg
         cat test.cfg
 
     - name: Run tests
       shell: bash
       run: |
-        export PYTHONPATH=lib:$PYTHONPATH
+        export PYTHONPATH=test:lib:$PYTHONPATH
         export HANDLE_SERVICE_TEST_CFG=`pwd`/test.cfg
         coverage run -m unittest discover -p "*_test.py"
         coverage xml

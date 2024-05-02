@@ -13,3 +13,21 @@ test.temp.dir=temp_test_dir
 # Whether test files should be discarded after testing is complete.
 # Anything other than 'false' is considered true.
 test.delete.temp.dir=true
+
+# The root url of the auth server.
+auth-service-url=
+
+# The KBase authorization service mkII url.
+auth-url=
+
+# The root url of the shock server.
+shock-url=
+
+# admin token
+admin-token=
+
+# admin roles
+admin-roles=
+
+# A prefix appended to handle id
+namespace=

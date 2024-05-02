@@ -1,16 +1,18 @@
 # -*- coding: utf-8 -*-
-import os
 import unittest
 from datetime import datetime
 
 from AbstractHandle.Utils.TokenCache import TokenCache
+
+import mongo_util
 
 
 class TokenCacheTest(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        cls.token = os.environ.get('KB_AUTH_TOKEN', None)
+        _, deploy_config = mongo_util.get_config()
+        cls.token = deploy_config["admin-token"]
         CACHE_EXPIRE_TIME = 300
         cls.token_cache = TokenCache(1000, CACHE_EXPIRE_TIME)
 

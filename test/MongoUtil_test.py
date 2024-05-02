@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 import os
 import unittest
-from configparser import ConfigParser
 import inspect
 import copy
 import threading
@@ -21,17 +20,12 @@ class MongoUtilTest(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        config_file = os.environ.get('KB_DEPLOYMENT_CONFIG', None)
-        cls.cfg = {}
-        config = ConfigParser()
-        config.read(config_file)
-        for nameval in config.items('AbstractHandle'):
-            cls.cfg[nameval[0]] = nameval[1]
-
+        mongo_config, deploy_config = mongo_util.get_config()
+        cls.cfg = deploy_config
         cls.cfg['mongo-authmechanism'] = 'DEFAULT'
-        
-        mongo_exe, mongo_temp, use_wired_tiger, delete_temp_dir = mongo_util.get_mongo_info()
+
         # TODO TEST allow testing with wired tiger on or off
+        mongo_exe, mongo_temp, use_wired_tiger, delete_temp_dir = mongo_config
         cls.mongo_controller = MongoController(mongo_exe, mongo_temp, use_wired_tiger)
         cls.cfg['mongo-host'] = "localhost"
         cls.cfg["mongo-port"] = cls.mongo_controller.port
