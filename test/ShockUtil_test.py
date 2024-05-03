@@ -53,15 +53,16 @@ class ShockUtilTest(unittest.TestCase):
     def createTestNode(self):
         curr_dir = os.path.dirname(os.path.abspath(__file__))
         filename = 'mytestfile_{}'.format(str(uuid.uuid4()))
+        file_path = os.path.join(curr_dir, filename)
 
-        with open(os.path.join(curr_dir, filename), 'w') as f:
+        with open(file_path, 'w') as f:
             f.write('my test file!')
 
         headers = {'Authorization': 'OAuth {}'.format(self.token)}
 
         end_point = os.path.join(self.shock_url, 'node?filename={}&format=text'.format(filename))
 
-        with open(filename, 'rb') as f:
+        with open(file_path, 'rb') as f:
             resp = _requests.post(end_point, data=f, headers=headers)
 
             if resp.status_code != 200:
