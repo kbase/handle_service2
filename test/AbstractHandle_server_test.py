@@ -48,7 +48,6 @@ class handle_serviceTest(unittest.TestCase):
                     'authenticated': 1
         }
         cls.scratch = cls.cfg['scratch']
-        cls.callback_url = os.environ['SDK_CALLBACK_URL']
 
         # TODO TEST allow testing with wired tiger on or off
         mongo_exe, mongo_temp, use_wired_tiger, delete_temp_dir = mongo_config
