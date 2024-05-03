@@ -34,3 +34,6 @@ namespace=KBH
 
 # Mongo database name
 mongo-database=handle_db
+
+# Scratch url
+scratch=/kb/module/work/tmp
