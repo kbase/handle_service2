@@ -24,6 +24,7 @@ TEST_SHOCK_URL = "shock-url"
 TEST_ADMIN_TOKEN = "admin-token"
 TEST_ADMIN_ROLES = "admin-roles"
 TEST_NAME_SPACE = "namespace"
+TEST_DATABASE_NAME = "mongo-database"
 
 def get_config() -> Tuple[List[Union[Path, bool]], dict[str, str]]:
     """
@@ -45,6 +46,7 @@ def get_config() -> Tuple[List[Union[Path, bool]], dict[str, str]]:
     admin_token = _get_value(section, TEST_ADMIN_TOKEN, config_path, True)
     admin_roles = _get_value(section, TEST_ADMIN_ROLES, config_path, True)
     name_space = _get_value(section, TEST_NAME_SPACE, config_path, True)
+    db_name = _get_value(section, TEST_DATABASE_NAME, config_path, True)
 
     mongo_config = [
         Path(mongo_exe_path),
@@ -60,6 +62,7 @@ def get_config() -> Tuple[List[Union[Path, bool]], dict[str, str]]:
         TEST_ADMIN_TOKEN: admin_token,
         TEST_ADMIN_ROLES: admin_roles,
         TEST_NAME_SPACE: name_space,
+        TEST_DATABASE_NAME: db_name,
     }
 
     return mongo_config, deploy_config
