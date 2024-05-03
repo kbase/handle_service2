@@ -70,7 +70,7 @@ jobs:
       run: |
         export PYTHONPATH=test:lib:$PYTHONPATH
         export HANDLE_SERVICE_TEST_CFG=`pwd`/test.cfg
-        coverage run -m unittest discover -p "*_test.py"
+        coverage run -m unittest discover "*_test.py"
         coverage xml
 
     - name: Upload coverage to Codecov
