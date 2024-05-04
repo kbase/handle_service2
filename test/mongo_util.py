@@ -78,7 +78,8 @@ def _get_config_file_path() -> str:
     config_path = os.environ.get(TEST_CONFIG_PATH)
     if not config_path:
         raise ValueError(
-            f"Must supply absolute path to test config file in {TEST_CONFIG_PATH} environment variable"
+            f"Must supply absolute path to test config file "
+            f"in {TEST_CONFIG_PATH} environment variable"
         )
     return config_path
 
