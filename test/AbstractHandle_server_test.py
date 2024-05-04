@@ -49,8 +49,8 @@ class handle_serviceTest(unittest.TestCase):
         }
         cls.scratch = cls.cfg['scratch']
 
-        # TODO TEST allow testing with wired tiger on or off
         mongo_exe, mongo_temp, use_wired_tiger, delete_temp_dir = mongo_config
+        cls.delete_temp_dir = delete_temp_dir
         cls.mongo_controller = MongoController(
             mongo_exe, mongo_temp, use_wired_tiger=use_wired_tiger
         )
@@ -64,8 +64,7 @@ class handle_serviceTest(unittest.TestCase):
     @classmethod
     def tearDownClass(cls):
         if hasattr(cls, "mongo_controller"):
-            # TODO TEST allow specifying whether test files should be destroyed
-            cls.mongo_controller.destroy(False)
+            cls.mongo_controller.destroy(cls.delete_temp_dir)
         if hasattr(cls, 'shock_ids_to_delete'):
             print('Nodes to delete: {}'.format(cls.shock_ids_to_delete))
             cls.deleteShockID(cls.shock_ids_to_delete)
