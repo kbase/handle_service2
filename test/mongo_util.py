@@ -27,11 +27,14 @@ TEST_NAME_SPACE = "namespace"
 TEST_DATABASE_NAME = "mongo-database"
 TEST_SCRATCH = "scratch"
 
+
 def get_config() -> Tuple[List[Union[Path, bool]], dict[str, str]]:
     """
     Returns:
-        Mongo config that stores mongo executable, temporary directory, wired_tiger, and delete_temp_dir
-        Deploy config that stores auther_serice_url, auth_url, shock_url, admin_token, admin_roles, namespace, db_name, and scratch
+        Mongo config that stores mongo executable, temporary directory,
+            wired_tiger, and delete_temp_dir
+        Deploy config that stores auther_serice_url, auth_url, shock_url,
+            admin_token, admin_roles, namespace, db_name, and scratch
     """
     config_path = _get_config_file_path()
     section = _get_test_config(config_path)
@@ -53,8 +56,8 @@ def get_config() -> Tuple[List[Union[Path, bool]], dict[str, str]]:
     mongo_config = [
         Path(mongo_exe_path),
         Path(mongo_temp_dir),
-        wired_tiger=="true",
-        delete_temp_dir!="false",
+        wired_tiger == "true",
+        delete_temp_dir != "false",
     ]
 
     deploy_config = {
@@ -70,6 +73,7 @@ def get_config() -> Tuple[List[Union[Path, bool]], dict[str, str]]:
 
     return mongo_config, deploy_config
 
+
 def _get_config_file_path() -> str:
     config_path = os.environ.get(TEST_CONFIG_PATH)
     if not config_path:
@@ -77,6 +81,7 @@ def _get_config_file_path() -> str:
             f"Must supply absolute path to test config file in {TEST_CONFIG_PATH} environment variable"
         )
     return config_path
+
 
 def _get_test_config(config_path) -> dict[str, str]:
     cfg = dict()
@@ -86,13 +91,16 @@ def _get_test_config(config_path) -> dict[str, str]:
         cfg[key] = val
     return cfg
 
+
 def _get_value(section, key, path, required) -> str:
     val = section.get(key, "").strip()
     if val == "" and required:
         raise ValueError(
-            f"Required key {key} in section {TEST_SECTION} in config file {path} is missing a value"
-		)
+            f"Required key {key} in section {TEST_SECTION} in config file {path} "
+            f"is missing a value"
+        )
     return val
+
 
 def _get_default_handles():
 
@@ -121,6 +129,7 @@ def _get_default_handles():
         handles.append(handle_doc)
 
     return handles
+
 
 def create_test_db(
     mc: MongoController,
