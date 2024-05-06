@@ -95,7 +95,7 @@ class MongoUtil:
         logging.info('start querying MongoDB')
 
         try:
-            result = self.handle_collection.find({field_name: {'$in': elements}},
+            cursor = self.handle_collection.find({field_name: {'$in': elements}},
                                                  projection=projection, batch_size=batch_size)
         except Exception as e:
             error_msg = 'Connot query doc\n'
@@ -104,9 +104,15 @@ class MongoUtil:
                             ''.join(traceback.format_exception(None, e, e.__traceback__)))
             raise ValueError(error_msg)
 
-        logging.info('returned {} results'.format(len(list(result))))
+        # Convert the cursor to a list
+        documents_list = list(cursor)
 
-        return result
+        # Close the cursor
+        cursor.close()
+
+        logging.info('returned {} results'.format(len(documents_list)))
+
+        return documents_list
 
     def insert_one(self, doc):
         """

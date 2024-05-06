@@ -84,26 +84,26 @@ class MongoUtilTest(unittest.TestCase):
         # test query 'hid' field
         elements = [68020, 68022, 0]
         docs = mongo_util.find_in(elements, 'hid')
-        self.assertEqual(docs.count(), 2)
+        self.assertEqual(len(docs), 2)
 
         # test query 'hid' field with empty data
         elements = [0]
         docs = mongo_util.find_in(elements, 'hid')
-        self.assertEqual(docs.count(), 0)
+        self.assertEqual(len(docs), 0)
 
         # test query 'id' field
         elements = ['b753774f-0bbd-4b96-9202-89b0c70bf31c']
         docs = mongo_util.find_in(elements, 'id')
-        self.assertEqual(docs.count(), 1)
-        doc = docs.next()
+        self.assertEqual(len(docs), 1)
+        doc = docs[0]
         self.assertFalse('_id' in doc.keys())
         self.assertEqual(doc.get('hid'), 68020)
 
         # test null projection
         elements = ['b753774f-0bbd-4b96-9202-89b0c70bf31c']
         docs = mongo_util.find_in(elements, 'id', projection=None)
-        self.assertEqual(docs.count(), 1)
-        doc = docs.next()
+        self.assertEqual(len(docs), 1)
+        doc = docs[0]
         self.assertEqual(doc.get('_id'), 68020)
         self.assertEqual(doc.get('hid'), 68020)
 
@@ -113,8 +113,8 @@ class MongoUtilTest(unittest.TestCase):
 
         elements = ['b753774f-0bbd-4b96-9202-89b0c70bf31c']
         docs = mongo_util.find_in(elements, 'id', projection=None)
-        self.assertEqual(docs.count(), 1)
-        doc = docs.next()
+        self.assertEqual(len(docs), 1)
+        doc = docs[0]
         self.assertEqual(doc.get('created_by'), 'tgu2')
 
         update_doc = copy.deepcopy(doc)
@@ -124,7 +124,8 @@ class MongoUtilTest(unittest.TestCase):
         mongo_util.update_one(update_doc)
 
         docs = mongo_util.find_in(elements, 'id', projection=None)
-        new_doc = docs.next()
+        self.assertEqual(len(docs), 1)
+        new_doc = docs[0]
         self.assertEqual(new_doc.get('created_by'), new_user)
 
         mongo_util.update_one(doc)
@@ -132,7 +133,8 @@ class MongoUtilTest(unittest.TestCase):
     def test_insert_one_ok(self):
         self.start_test()
         mongo_util = self.getMongoUtil()
-        self.assertEqual(mongo_util.handle_collection.find().count(), 10)
+        docs = list(mongo_util.handle_collection.find())
+        self.assertEqual(len(docs), 10)
 
         doc = {'_id': 9999, 'hid': 9999, 'file_name': 'fake_file'}
         counter = mongo_util.get_hid_counter()
@@ -140,16 +142,18 @@ class MongoUtilTest(unittest.TestCase):
         new_counter = mongo_util.get_hid_counter()
         self.assertEqual(new_counter, counter)
 
-        self.assertEqual(mongo_util.handle_collection.find().count(), 11)
+        docs = list(mongo_util.handle_collection.find())
+        self.assertEqual(len(docs), 11)
         elements = [9999]
         docs = mongo_util.find_in(elements, 'hid', projection=None)
-        self.assertEqual(docs.count(), 1)
-        doc = docs.next()
+        self.assertEqual(len(docs), 1)
+        doc = docs[0]
         self.assertEqual(doc.get('hid'), 9999)
         self.assertEqual(doc.get('file_name'), 'fake_file')
 
         mongo_util.delete_one(doc)
-        self.assertEqual(mongo_util.handle_collection.find().count(), 10)
+        docs = list(mongo_util.handle_collection.find())
+        self.assertEqual(len(docs), 10)
 
     def test_increase_counter_with_multi_threads(self):
 
@@ -191,43 +195,47 @@ class MongoUtilTest(unittest.TestCase):
     def test_delete_one_ok(self):
         self.start_test()
         mongo_util = self.getMongoUtil()
-        docs = mongo_util.handle_collection.find()
-        self.assertEqual(docs.count(), 10)
+        docs = list(mongo_util.handle_collection.find())
+        self.assertEqual(len(docs), 10)
 
-        doc = docs.next()
+        doc = docs[0]
         hid = doc.get('hid')
         mongo_util.delete_one(doc)
-        self.assertEqual(mongo_util.handle_collection.find().count(), 9)
+        docs = list(mongo_util.handle_collection.find())
+        self.assertEqual(len(docs), 9)
 
         docs = mongo_util.find_in([hid], 'hid', projection=None)
-        self.assertEqual(docs.count(), 0)
+        self.assertEqual(len(docs), 0)
 
         mongo_util.insert_one(doc)
-        self.assertEqual(mongo_util.handle_collection.find().count(), 10)
+        docs = list(mongo_util.handle_collection.find())
+        self.assertEqual(len(docs), 10)
         docs = mongo_util.find_in([hid], 'hid', projection=None)
-        self.assertEqual(docs.count(), 1)
+        self.assertEqual(len(docs), 1)
 
     def test_delete_many_ok(self):
         self.start_test()
         mongo_util = self.getMongoUtil()
-        docs = mongo_util.handle_collection.find()
-        self.assertEqual(docs.count(), 10)
+        docs = list(mongo_util.handle_collection.find())
+        self.assertEqual(len(docs), 10)
 
         docs_to_delete = list()
-        docs_to_delete.append(docs.next())
-        docs_to_delete.append(docs.next())
+        docs_to_delete.append(docs.pop())
+        docs_to_delete.append(docs.pop())
         docs_to_delete = docs_to_delete * 2  # test delete duplicate items
         deleted_count = mongo_util.delete_many(docs_to_delete)
         self.assertEqual(deleted_count, 2)
-        self.assertEqual(mongo_util.handle_collection.find().count(), 8)
+        docs = list(mongo_util.handle_collection.find())
+        self.assertEqual(len(docs), 8)
         docs = mongo_util.find_in([doc.get('hid') for doc in docs_to_delete], 'hid')
-        self.assertEqual(docs.count(), 0)
+        self.assertEqual(len(docs), 0)
 
         for doc in docs_to_delete:
             try:
                 mongo_util.insert_one(doc)
             except Exception:
                 pass
-        self.assertEqual(mongo_util.handle_collection.find().count(), 10)
+        docs = list(mongo_util.handle_collection.find())
+        self.assertEqual(len(docs), 10)
         docs = mongo_util.find_in([doc.get('hid') for doc in docs_to_delete], 'hid')
-        self.assertEqual(docs.count(), 2)
+        self.assertEqual(len(docs), 2)
