@@ -88,7 +88,9 @@ class MongoController:
 
     def get_mongodb_version(self, mongoexe: Path) -> str:
         try:
-            process = subprocess.Popen([str(mongoexe), '--version'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            process = subprocess.Popen(
+                [str(mongoexe), '--version'], stdout=subprocess.PIPE, stderr=subprocess.PIPE
+            )
             stdout, stderr = process.communicate()
 
             if process.returncode == 0:

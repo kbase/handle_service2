@@ -83,7 +83,7 @@ class MongoUtil:
         """
         counter = self.hid_counter_collection.find({'_id': {'$eq': self._HID_COUNTER_ID}})
 
-        if counter.count():
+        if counter.count_documents({}):
             return counter.next().get('hid_counter')
         else:
             return 0
@@ -104,7 +104,7 @@ class MongoUtil:
                             ''.join(traceback.format_exception(None, e, e.__traceback__)))
             raise ValueError(error_msg)
 
-        logging.info('returned {} results'.format(result.count()))
+        logging.info('returned {} results'.format(result.count_documents({})))
 
         return result
 
