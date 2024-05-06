@@ -68,14 +68,15 @@ class MongoController:
 
         self._proc = subprocess.Popen(command, stdout=self._outfile, stderr=subprocess.STDOUT)
         time.sleep(1)  # wait for server to start up
-        self.client: MongoClient = MongoClient('localhost', self.port)
-        # check that the server is up. See
-        # https://api.mongodb.com/python/3.7.0/api/pymongo/mongo_client.html
-        #    #pymongo.mongo_client.MongoClient
-        self.client.admin.command('ismaster')
+
+        try:
+            self.client: MongoClient = MongoClient('localhost', self.port)
+            server_info = self.client.server_info()  # This line will raise an exception if the server is down
+        except Exception as e:
+            raise ValueError(f"MongoDB server is down.") from e
 
         # get some info about the db
-        self.db_version = self.client.server_info()['version']
+        self.db_version = server_info['version']
         s = semver.VersionInfo.parse
         self.index_version = 2 if (s(self.db_version) >= s('3.4.0')) else 1
         self.includes_system_indexes = (s(self.db_version) < s('3.2.0') and not use_wired_tiger)
