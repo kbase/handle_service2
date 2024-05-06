@@ -104,6 +104,11 @@ class MongoUtil:
                             ''.join(traceback.format_exception(None, e, e.__traceback__)))
             raise ValueError(error_msg)
 
+        print(f"result type is {type(result)}")
+        print(result)
+        num_documents = len(list(result))
+        print(num_documents)
+        print("*" * 30)
         logging.info('returned {} results'.format(result.count_documents({})))
 
         return result
