@@ -55,10 +55,7 @@ RUN pip install --upgrade pip && \
 
 # install deps
 COPY Pipfile* ./
-RUN pipenv sync
-
-# activate virtual env
-RUN pipenv shell
+RUN pipenv sync --system
 
 # -----------------------------------------
 

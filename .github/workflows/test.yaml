@@ -44,9 +44,9 @@ jobs:
       run: |
 
         # install python libraries
+        python -m pip install --upgrade pip
         pip install pipenv
-        pipenv sync
-        pipenv shell
+        pipenv install --dev
 
         # set up mongo
         cd ..
@@ -72,7 +72,7 @@ jobs:
       run: |
         export PYTHONPATH=test:lib:$PYTHONPATH
         export HANDLE_SERVICE_TEST_CFG=`pwd`/test.cfg
-        pytest --cov=lib/AbstractHandle --cov-report=xml test
+        pipenv run pytest --cov=lib/AbstractHandle --cov-report=xml test
 
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v3
