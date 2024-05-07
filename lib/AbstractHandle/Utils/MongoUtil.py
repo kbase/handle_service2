@@ -81,10 +81,12 @@ class MongoUtil:
         """
         get current handle id counter
         """
-        counter = self.hid_counter_collection.find({'_id': {'$eq': self._HID_COUNTER_ID}})
+        cursor = self.hid_counter_collection.find({'_id': {'$eq': self._HID_COUNTER_ID}})
+        docs = list(cursor)
+        cursor.close()
 
-        if len(list(counter)):
-            return counter.next().get('hid_counter')
+        if len(docs):
+            return docs[0].get('hid_counter')
         else:
             return 0
 
@@ -104,10 +106,7 @@ class MongoUtil:
                             ''.join(traceback.format_exception(None, e, e.__traceback__)))
             raise ValueError(error_msg)
 
-        # Convert the cursor to a list
         documents_list = list(cursor)
-
-        # Close the cursor
         cursor.close()
 
         logging.info('returned {} results'.format(len(documents_list)))
