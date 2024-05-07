@@ -31,7 +31,7 @@ class handle_serviceTest(unittest.TestCase):
         authServiceUrl = cls.cfg['auth-service-url']
         auth_client = _KBaseAuth(authServiceUrl)
         cls.user_id = auth_client.get_user(cls.token)
-        cls.shock_url = cls.cfg['shock-url']
+        cls.shock_url = cls.cfg['blobstore-url']
         # Normally this is a AbstractHandleserver.MethodContext object. However, due to 10+ year
         # old poor design, on import the server loads the config file and sets up the
         # implementation object, which immediately tries to contact Mongo. We don't need the
@@ -47,12 +47,12 @@ class handle_serviceTest(unittest.TestCase):
                     ],
                     'authenticated': 1
         }
-        cls.scratch = cls.cfg['scratch']
 
-        mongo_exe, mongo_temp, use_wired_tiger, delete_temp_dir = mongo_config
-        cls.delete_temp_dir = delete_temp_dir
+        cls.delete_temp_dir = mongo_config.delete_temp_dir
         cls.mongo_controller = MongoController(
-            mongo_exe, mongo_temp, use_wired_tiger=use_wired_tiger
+            mongo_config.mongo_exe,
+            mongo_config.mongo_temp,
+            use_wired_tiger=mongo_config.use_wired_tiger
         )
         cls.cfg['mongo-host'] = "localhost"
         cls.cfg["mongo-port"] = cls.mongo_controller.port

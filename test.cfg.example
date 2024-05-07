@@ -15,13 +15,13 @@ test.temp.dir=temp_test_dir
 test.delete.temp.dir=true
 
 # The root url of the auth server.
-auth-service-url=
+auth-service-url=https://ci.kbase.us/services/auth/api/legacy/KBase/Sessions/Login
 
 # The KBase authorization service mkII url.
-auth-url=
+auth-url=https://ci.kbase.us/services/auth
 
-# The root url of the shock server.
-shock-url=
+# The root url of the blob store server.
+blobstore-url=https://ci.kbase.us/services/shock-api
 
 # Admin token
 admin-token=
@@ -34,6 +34,3 @@ namespace=KBH
 
 # Mongo database name
 mongo-database=handle_db
-
-# Scratch url
-scratch=/kb/module/work/tmp

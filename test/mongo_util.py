@@ -1,16 +1,17 @@
 import logging
 import os
 
+from collections import namedtuple
 from configparser import ConfigParser
 from datetime import datetime
 from pathlib import Path
-from typing import List, Tuple, Union
+from typing import Tuple
 
 from mongo_controller import MongoController
 from AbstractHandle.Utils import MongoUtil
 
 # Mongo config
-TEST_CONFIG_PATH = "HANDLE_SERVICE_TEST_CFG"
+TEST_CONFIG_ENV_PATH = "HANDLE_SERVICE_TEST_CFG"
 TEST_SECTION = "HandleService2"
 TEST_MONGO_EXE = "test.mongo.exe"
 TEST_TEMP_DIR = "test.temp.dir"
@@ -20,21 +21,25 @@ TEST_DELETE_TEMP_DIR = "test.delete.temp.dir"
 # Deploy config
 TEST_AUTH_SERVICE_URL = "auth-service-url"
 TEST_AUTH_URL = "auth-url"
-TEST_SHOCK_URL = "shock-url"
+TEST_BLOBSTORE_URL = "blobstore-url"
 TEST_ADMIN_TOKEN = "admin-token"
 TEST_ADMIN_ROLES = "admin-roles"
 TEST_NAME_SPACE = "namespace"
 TEST_DATABASE_NAME = "mongo-database"
-TEST_SCRATCH = "scratch"
+
+MongoConfigTuple = namedtuple(
+    "MongoConfigTuple",
+    ["mongo_exe", "mongo_temp", "use_wired_tiger", "delete_temp_dir"]
+)
 
 
-def get_config() -> Tuple[List[Union[Path, bool]], dict[str, str]]:
+def get_config() -> Tuple[MongoConfigTuple, dict[str, str]]:
     """
     Returns:
         Mongo config that stores mongo executable, temporary directory,
             wired_tiger, and delete_temp_dir
         Deploy config that stores auther_serice_url, auth_url, shock_url,
-            admin_token, admin_roles, namespace, db_name, and scratch
+            admin_token, admin_roles, namespace, and db_name
     """
     config_path = _get_config_file_path()
     section = _get_test_config(config_path)
@@ -46,40 +51,38 @@ def get_config() -> Tuple[List[Union[Path, bool]], dict[str, str]]:
 
     auth_serivce_url = _get_value(section, TEST_AUTH_SERVICE_URL, config_path, True)
     auth_url = _get_value(section, TEST_AUTH_URL, config_path, True)
-    shock_url = _get_value(section, TEST_SHOCK_URL, config_path, True)
+    blobstore_url = _get_value(section, TEST_BLOBSTORE_URL, config_path, True)
     admin_token = _get_value(section, TEST_ADMIN_TOKEN, config_path, True)
     admin_roles = _get_value(section, TEST_ADMIN_ROLES, config_path, True)
     name_space = _get_value(section, TEST_NAME_SPACE, config_path, True)
     db_name = _get_value(section, TEST_DATABASE_NAME, config_path, True)
-    scratch = _get_value(section, TEST_SCRATCH, config_path, True)
 
-    mongo_config = [
+    mongo_config = MongoConfigTuple(
         Path(mongo_exe_path),
         Path(mongo_temp_dir),
         wired_tiger == "true",
         delete_temp_dir != "false",
-    ]
+    )
 
     deploy_config = {
         TEST_AUTH_SERVICE_URL: auth_serivce_url,
         TEST_AUTH_URL: auth_url,
-        TEST_SHOCK_URL: shock_url,
+        TEST_BLOBSTORE_URL: blobstore_url,
         TEST_ADMIN_TOKEN: admin_token,
         TEST_ADMIN_ROLES: admin_roles,
         TEST_NAME_SPACE: name_space,
         TEST_DATABASE_NAME: db_name,
-        TEST_SCRATCH: scratch,
     }
 
     return mongo_config, deploy_config
 
 
 def _get_config_file_path() -> str:
-    config_path = os.environ.get(TEST_CONFIG_PATH)
+    config_path = os.environ.get(TEST_CONFIG_ENV_PATH)
     if not config_path:
         raise ValueError(
             f"Must supply absolute path to test config file "
-            f"in {TEST_CONFIG_PATH} environment variable"
+            f"in {TEST_CONFIG_ENV_PATH} environment variable"
         )
     return config_path
 
@@ -88,6 +91,10 @@ def _get_test_config(config_path) -> dict[str, str]:
     cfg = dict()
     config = ConfigParser()
     config.read(config_path)
+    if not config.has_section(TEST_SECTION):
+        raise ValueError(
+            f"Section {TEST_SECTION} does not exist in config file {config_path}"
+        )
     for key, val in config.items(TEST_SECTION):
         cfg[key] = val
     return cfg

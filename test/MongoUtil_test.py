@@ -24,10 +24,11 @@ class MongoUtilTest(unittest.TestCase):
         cls.cfg = deploy_config
         cls.cfg['mongo-authmechanism'] = 'DEFAULT'
 
-        mongo_exe, mongo_temp, use_wired_tiger, delete_temp_dir = mongo_config
-        cls.delete_temp_dir = delete_temp_dir
+        cls.delete_temp_dir = mongo_config.delete_temp_dir
         cls.mongo_controller = MongoController(
-            mongo_exe, mongo_temp, use_wired_tiger=use_wired_tiger
+            mongo_config.mongo_exe,
+            mongo_config.mongo_temp,
+            use_wired_tiger=mongo_config.use_wired_tiger
         )
         cls.cfg['mongo-host'] = "localhost"
         cls.cfg["mongo-port"] = cls.mongo_controller.port

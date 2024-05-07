@@ -39,12 +39,14 @@ jobs:
       env:
         AUTH_SERVICE_URL: https://ci.kbase.us/services/auth/api/legacy/KBase/Sessions/Login
         AUTH_URL: https://ci.kbase.us/services/auth
-        SHOCK_URL: https://ci.kbase.us/services/shock-api
+        BLOBSTORE_URL: https://ci.kbase.us/services/shock-api
         ADMIN_TOKEN: ${{secrets.KBASE_CI_TOKEN}}
       run: |
 
         # install python libraries
-        pip install -r requirements.txt  
+        pip install pipenv
+        pipenv sync
+        pipenv shell
 
         # set up mongo
         cd ..
@@ -61,7 +63,7 @@ jobs:
 
         sed -i "s#^auth-service-url.*#auth-service-url=$AUTH_SERVICE_URL#" test.cfg
         sed -i "s#^auth-url.*#auth-url=$AUTH_URL#" test.cfg
-        sed -i "s#^shock-url.*#shock-url=$SHOCK_URL#" test.cfg
+        sed -i "s#^blobstore-url.*#blobstore-url=$BLOBSTORE_URL#" test.cfg
         sed -i "s#^admin-token.*#admin-token=$ADMIN_TOKEN#" test.cfg
         cat test.cfg
 
@@ -70,8 +72,7 @@ jobs:
       run: |
         export PYTHONPATH=test:lib:$PYTHONPATH
         export HANDLE_SERVICE_TEST_CFG=`pwd`/test.cfg
-        coverage run -m unittest discover -p "*_test.py"
-        coverage xml
+        pytest --cov=lib/AbstractHandle --cov-report=xml test
 
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v3

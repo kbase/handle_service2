@@ -49,19 +49,16 @@ RUN $MONGO_EXE_PATH --version
 ### Install python deps
 #######################
 
-RUN conda config --add channels conda-forge
-# uwsgi install fails with pip due to some kind of incompatibility with conda
-# note this step takes FOREVER
-# should probably try to get rid of conda, it's a nightmare to deal with
-RUN conda install -y uwsgi=2.0.22
+# install pipenv
+RUN pip install --upgrade pip && \
+    pip install pipenv
 
-# Conda fails to install these due to what appears to be an overly strict dependency graph solver
-RUN pip install \
-        pymongo==3.8.0 \
-        mock==4.0.3 \
-        cachetools==4.2.2 \
-        coverage==5.5 \
-        semver==3.0.2
+# install deps
+COPY Pipfile* ./
+RUN pipenv sync
+
+# activate virtual env
+RUN pipenv shell
 
 # -----------------------------------------
 
