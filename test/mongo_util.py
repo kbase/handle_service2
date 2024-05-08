@@ -27,7 +27,7 @@ TEST_ADMIN_ROLES = "admin-roles"
 TEST_NAME_SPACE = "namespace"
 TEST_DATABASE_NAME = "mongo-database"
 TEST_DATABASE_USER = "mongo-user"
-TEST_DATABASE_PWD = "mongo-pwd"
+TEST_DATABASE_PWD = "mongo-password"
 
 MongoConfigTuple = namedtuple(
     "MongoConfigTuple",
