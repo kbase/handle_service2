@@ -46,6 +46,18 @@ RUN echo $MONGO_TEMP_DIR
 RUN $MONGO_EXE_PATH --version
 
 #######################
+### Install kb-sdk
+#######################
+RUN docker pull kbase/kb-sdk
+
+RUN mkdir $HOME/bin/
+# Generate the kb-sdk script and put it in ~/bin/kb-sdk
+RUN docker run kbase/kb-sdk genscript > $HOME/bin/kb-sdk
+RUN chmod +x $HOME/bin/kb-sdk
+# Add ~/bin to your $PATH if it is not already there
+RUN export PATH=$PATH:$HOME/bin/
+
+#######################
 ### Install python deps
 #######################
 
