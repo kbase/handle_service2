@@ -65,6 +65,9 @@ RUN conda install -y uwsgi=2.0.22
 #         requests==2.31.0 \
 #         semver==3.0.2
 
+# Update pip to the latest version
+RUN pip install --no-cache-dir --upgrade pip
+
 # Copy the requirements.txt file into the container
 COPY requirements.txt ./requirements.txt
 
