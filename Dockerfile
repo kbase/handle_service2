@@ -28,34 +28,39 @@ RUN wget -q https://github.com/kbase/dockerize/raw/master/dockerize-linux-amd64-
 RUN mkdir -p /kb/deployment/bin/
 RUN ln -s /opt/dockerize /kb/deployment/bin/dockerize
 
-###################
-### install mongodb
-###################
+# ###################
+# ### install mongodb
+# ###################
 
-# TODO Set things up so we can test against multiple versions of Mongo in GHA. This might work?
-ENV MONGO_VER=mongodb-linux-x86_64-3.6.23
+# # TODO Set things up so we can test against multiple versions of Mongo in GHA. This might work?
+# ENV MONGO_VER=mongodb-linux-x86_64-3.6.23
 
-RUN mkdir -p /mongo/tmpdata
-WORKDIR /mongo
-RUN wget -q http://fastdl.mongodb.org/linux/$MONGO_VER.tgz
-RUN tar xfz $MONGO_VER.tgz && rm $MONGO_VER.tgz
-ENV MONGO_EXE_PATH=/mongo/$MONGO_VER/bin/mongod
-ENV MONGO_TEMP_DIR=/mongo/tmpdata
-RUN echo $MONGO_EXE_PATH
-RUN echo $MONGO_TEMP_DIR
-RUN $MONGO_EXE_PATH --version
+# RUN mkdir -p /mongo/tmpdata
+# WORKDIR /mongo
+# RUN wget -q http://fastdl.mongodb.org/linux/$MONGO_VER.tgz
+# RUN tar xfz $MONGO_VER.tgz && rm $MONGO_VER.tgz
+# ENV MONGO_EXE_PATH=/mongo/$MONGO_VER/bin/mongod
+# ENV MONGO_TEMP_DIR=/mongo/tmpdata
+# RUN echo $MONGO_EXE_PATH
+# RUN echo $MONGO_TEMP_DIR
+# RUN $MONGO_EXE_PATH --version
 
 #######################
 ### Install kb-sdk
 #######################
-RUN docker pull kbase/kb-sdk
 
-RUN mkdir $HOME/bin/
-# Generate the kb-sdk script and put it in ~/bin/kb-sdk
-RUN docker run kbase/kb-sdk genscript > $HOME/bin/kb-sdk
-RUN chmod +x $HOME/bin/kb-sdk
-# Add ~/bin to your $PATH if it is not already there
-RUN export PATH=$PATH:$HOME/bin/
+# # Install Docker
+# RUN curl -fsSL https://get.docker.com -o get-docker.sh && \
+#     sh get-docker.sh
+
+# RUN docker pull kbase/kb-sdk
+
+# RUN mkdir $HOME/bin/
+# # Generate the kb-sdk script and put it in ~/bin/kb-sdk
+# RUN docker run kbase/kb-sdk genscript > $HOME/bin/kb-sdk
+# RUN chmod +x $HOME/bin/kb-sdk
+# # Add ~/bin to your $PATH if it is not already there
+# RUN export PATH=$PATH:$HOME/bin/
 
 #######################
 ### Install python deps
@@ -94,7 +99,8 @@ RUN chmod -R a+rw /kb/module
 
 WORKDIR /kb/module
 
-RUN make all
+# RUN make all
+RUN make build build-executable-script build-startup-script
 
 ENTRYPOINT [ "./scripts/entrypoint.sh" ]
 
