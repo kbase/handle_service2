@@ -72,7 +72,7 @@ class MongoController:
         # check that the server is up. See
         # https://api.mongodb.com/python/3.7.0/api/pymongo/mongo_client.html
         #    #pymongo.mongo_client.MongoClient
-        # self.client.admin.command('ismaster')
+        self.client.admin.command('ismaster')
 
         # get some info about the db
         self.db_version = self.client.server_info()['version']
