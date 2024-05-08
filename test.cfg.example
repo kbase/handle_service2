@@ -34,3 +34,9 @@ namespace=KBH
 
 # Mongo database name
 mongo-database=handle_db
+
+# If the mongo database is authenticated, the user name of a read/write account.
+mongo-user=
+
+# If the mongo database is authenticated, the password for the given username.
+mongo-pwd=

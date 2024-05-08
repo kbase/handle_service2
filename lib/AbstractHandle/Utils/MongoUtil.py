@@ -57,8 +57,8 @@ class MongoUtil:
         self.mongo_host = config['mongo-host']
         self.mongo_port = int(config['mongo-port'])
         self.mongo_database = config['mongo-database']
-        self.mongo_user = config.get('mongo-user')
-        self.mongo_pass = config.get('mongo-password')
+        self.mongo_user = config['mongo-user']
+        self.mongo_pass = config['mongo-password']
         self.mongo_authmechanism = config['mongo-authmechanism']
 
         self.handle_collection = self._get_collection(self.mongo_host, self.mongo_port,

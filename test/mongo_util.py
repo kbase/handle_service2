@@ -26,6 +26,8 @@ TEST_ADMIN_TOKEN = "admin-token"
 TEST_ADMIN_ROLES = "admin-roles"
 TEST_NAME_SPACE = "namespace"
 TEST_DATABASE_NAME = "mongo-database"
+TEST_DATABASE_USER = "mongo-user"
+TEST_DATABASE_PWD = "mongo-pwd"
 
 MongoConfigTuple = namedtuple(
     "MongoConfigTuple",
@@ -39,7 +41,7 @@ def get_config() -> Tuple[MongoConfigTuple, dict[str, str]]:
         Mongo config that stores mongo executable, temporary directory,
             wired_tiger, and delete_temp_dir
         Deploy config that stores auther_serice_url, auth_url, shock_url,
-            admin_token, admin_roles, namespace, and db_name
+            admin_token, admin_roles, namespace, db_name, and mongo_user, and mongo_pwd
     """
     config_path = _get_config_file_path()
     section = _get_test_config(config_path)
@@ -56,6 +58,8 @@ def get_config() -> Tuple[MongoConfigTuple, dict[str, str]]:
     admin_roles = _get_value(section, TEST_ADMIN_ROLES, config_path, True)
     name_space = _get_value(section, TEST_NAME_SPACE, config_path, True)
     db_name = _get_value(section, TEST_DATABASE_NAME, config_path, True)
+    mongo_user = _get_value(section, TEST_DATABASE_USER, config_path, False)
+    mongo_pwd = _get_value(section, TEST_DATABASE_PWD, config_path, False)
 
     mongo_config = MongoConfigTuple(
         Path(mongo_exe_path),
@@ -72,6 +76,8 @@ def get_config() -> Tuple[MongoConfigTuple, dict[str, str]]:
         TEST_ADMIN_ROLES: admin_roles,
         TEST_NAME_SPACE: name_space,
         TEST_DATABASE_NAME: db_name,
+        TEST_DATABASE_USER: mongo_user,
+        TEST_DATABASE_PWD: mongo_pwd,
     }
 
     return mongo_config, deploy_config
