@@ -53,7 +53,7 @@ RUN conda config --add channels conda-forge
 # uwsgi install fails with pip due to some kind of incompatibility with conda
 # note this step takes FOREVER
 # should probably try to get rid of conda, it's a nightmare to deal with
-# RUN conda install -y uwsgi=2.0.22
+RUN conda install -y uwsgi=2.0.22
 
 # # Conda fails to install these due to what appears to be an overly strict dependency graph solver
 # RUN pip install \
@@ -68,9 +68,8 @@ RUN conda config --add channels conda-forge
 # Copy the requirements.txt file into the container
 COPY requirements.txt ./requirements.txt
 
-# Install packages from requirements.txt using conda
-RUN conda install -y --file ./requirements.txt && \
-    conda clean --all --yes
+# Install packages from requirements.txt using pip
+RUN pip install -r requirements.txt --exclude uwsgi
 
 # -----------------------------------------
 
