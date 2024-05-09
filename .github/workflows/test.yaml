@@ -46,8 +46,6 @@ jobs:
         # install python libraries
         python -m pip install --upgrade pip
         pip install -r requirements.txt
-        # pip install pipenv
-        # pipenv install --dev
 
         # set up mongo
         cd ..
