@@ -32,14 +32,16 @@ RUN ln -s /opt/dockerize /kb/deployment/bin/dockerize
 ### install python deps
 #######################
 
-# Update pip to the latest version
+# update pip to the latest version
 RUN pip install --no-cache-dir --upgrade pip
 
-# Copy the requirements.txt file into the container
-COPY requirements.txt ./requirements.txt
+# install pipenv
+RUN pip install --upgrade pip && \
+    pip install pipenv
 
-# Install packages from requirements.txt using pip
-RUN pip install -r requirements.txt
+# install deps
+COPY Pipfile* ./
+RUN pipenv sync --system
 
 # -----------------------------------------
 
