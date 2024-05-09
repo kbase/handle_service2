@@ -28,59 +28,9 @@ RUN wget -q https://github.com/kbase/dockerize/raw/master/dockerize-linux-amd64-
 RUN mkdir -p /kb/deployment/bin/
 RUN ln -s /opt/dockerize /kb/deployment/bin/dockerize
 
-# ###################
-# ### install mongodb
-# ###################
-
-# # TODO Set things up so we can test against multiple versions of Mongo in GHA. This might work?
-# ENV MONGO_VER=mongodb-linux-x86_64-3.6.23
-
-# RUN mkdir -p /mongo/tmpdata
-# WORKDIR /mongo
-# RUN wget -q http://fastdl.mongodb.org/linux/$MONGO_VER.tgz
-# RUN tar xfz $MONGO_VER.tgz && rm $MONGO_VER.tgz
-# ENV MONGO_EXE_PATH=/mongo/$MONGO_VER/bin/mongod
-# ENV MONGO_TEMP_DIR=/mongo/tmpdata
-# RUN echo $MONGO_EXE_PATH
-# RUN echo $MONGO_TEMP_DIR
-# RUN $MONGO_EXE_PATH --version
-
 #######################
-### Install kb-sdk
+### install python deps
 #######################
-
-# # Install Docker
-# RUN curl -fsSL https://get.docker.com -o get-docker.sh && \
-#     sh get-docker.sh
-
-# RUN docker pull kbase/kb-sdk
-
-# RUN mkdir $HOME/bin/
-# # Generate the kb-sdk script and put it in ~/bin/kb-sdk
-# RUN docker run kbase/kb-sdk genscript > $HOME/bin/kb-sdk
-# RUN chmod +x $HOME/bin/kb-sdk
-# # Add ~/bin to your $PATH if it is not already there
-# RUN export PATH=$PATH:$HOME/bin/
-
-#######################
-### Install python deps
-#######################
-
-# RUN conda config --add channels conda-forge
-# uwsgi install fails with pip due to some kind of incompatibility with conda
-# note this step takes FOREVER
-# should probably try to get rid of conda, it's a nightmare to deal with
-# RUN conda install -y uwsgi=2.0.22
-
-# # Conda fails to install these due to what appears to be an overly strict dependency graph solver
-# RUN pip install \
-#         cachetools==4.2.2 \
-#         mock==4.0.3 \
-#         pymongo==3.8.0 \
-#         pytest==8.2.0 \
-#         pytest-cov==5.0.0 \
-#         requests==2.31.0 \
-#         semver==3.0.2
 
 # Update pip to the latest version
 RUN pip install --no-cache-dir --upgrade pip
@@ -99,8 +49,7 @@ RUN chmod -R a+rw /kb/module
 
 WORKDIR /kb/module
 
-# RUN make all
-RUN make build build-executable-script build-startup-script
+RUN make build build-startup-script
 
 ENTRYPOINT [ "./scripts/entrypoint.sh" ]
 
