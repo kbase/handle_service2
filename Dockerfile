@@ -38,7 +38,7 @@ RUN pip install --upgrade pip && \
 
 # install deps
 COPY Pipfile* ./
-RUN pipenv sync --system --without-dev
+RUN pipenv sync --system
 
 # -----------------------------------------
 
