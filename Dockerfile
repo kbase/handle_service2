@@ -32,16 +32,13 @@ RUN ln -s /opt/dockerize /kb/deployment/bin/dockerize
 ### install python deps
 #######################
 
-# update pip to the latest version
-RUN pip install --no-cache-dir --upgrade pip
-
 # install pipenv
 RUN pip install --upgrade pip && \
     pip install pipenv
 
 # install deps
 COPY Pipfile* ./
-RUN pipenv sync --system
+RUN pipenv sync --system --without-dev
 
 # -----------------------------------------
 
