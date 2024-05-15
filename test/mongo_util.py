@@ -55,7 +55,7 @@ def get_config() -> Tuple[MongoConfigTuple, dict[str, str]]:
     auth_serivce_url = _get_value(section, TEST_AUTH_SERVICE_URL, config_path, True)
     auth_url = _get_value(section, TEST_AUTH_URL, config_path, True)
     shock_url = _get_value(section, TEST_SHOCK_URL, config_path, True)
-    admin_token = _get_value(section, TEST_ADMIN_TOKEN, config_path, False)
+    admin_token = _get_value(section, TEST_ADMIN_TOKEN, config_path, True)
     test_token = _get_value(section, TEST_TEST_TOKEN, config_path, True)
     admin_roles = _get_value(section, TEST_ADMIN_ROLES, config_path, True)
     name_space = _get_value(section, TEST_NAME_SPACE, config_path, True)
