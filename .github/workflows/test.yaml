@@ -41,6 +41,7 @@ jobs:
         AUTH_URL: https://ci.kbase.us/services/auth
         SHOCK_URL: https://ci.kbase.us/services/shock-api
         TEST_TOKEN: ${{secrets.KBASE_CI_TOKEN}}
+        ADMIN_TOKEN: ${{secrets.KBASE_CI_TOKEN}}
       run: |
 
         # install python libraries
@@ -65,6 +66,7 @@ jobs:
         sed -i "s#^auth-url.*#auth-url=$AUTH_URL#" test.cfg
         sed -i "s#^shock-url.*#shock-url=$SHOCK_URL#" test.cfg
         sed -i "s#^test-token.*#test-token=$TEST_TOKEN#" test.cfg
+        sed -i "s#^admin-token.*#admin-token=$ADMIN_TOKEN#" test.cfg
 
     - name: Run tests
       shell: bash

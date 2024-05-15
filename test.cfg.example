@@ -24,7 +24,7 @@ auth-url=https://ci.kbase.us/services/auth
 shock-url=https://ci.kbase.us/services/shock-api
 
 # Blobstore read admin rights
-admin-token=faketoken_replace
+admin-token=
 
 # Token to run tests
 test-token=
