@@ -20,14 +20,14 @@ class HandlerTest(unittest.TestCase):
     def setUpClass(cls):
         mongo_config, deploy_config = mongo_util.get_config()
         cls.cfg = deploy_config
-        cls.token = deploy_config['admin-token']
+        cls.token = deploy_config['test-token']
 
         cls.cfg['mongo-authmechanism'] = 'DEFAULT'
         # Getting username from Auth profile for token
         authServiceUrl = cls.cfg['auth-service-url']
         auth_client = _KBaseAuth(authServiceUrl)
         cls.user_id = auth_client.get_user(cls.token)
-        cls.shock_url = cls.cfg['blobstore-url']
+        cls.shock_url = cls.cfg['shock-url']
 
         cls.delete_temp_dir = mongo_config.delete_temp_dir
         cls.mongo_controller = MongoController(

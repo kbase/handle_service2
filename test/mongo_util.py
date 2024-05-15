@@ -21,8 +21,9 @@ TEST_DELETE_TEMP_DIR = "test.delete.temp.dir"
 # Deploy config
 TEST_AUTH_SERVICE_URL = "auth-service-url"
 TEST_AUTH_URL = "auth-url"
-TEST_BLOBSTORE_URL = "blobstore-url"
+TEST_SHOCK_URL = "shock-url"
 TEST_ADMIN_TOKEN = "admin-token"
+TEST_TEST_TOKEN = "test-token"
 TEST_ADMIN_ROLES = "admin-roles"
 TEST_NAME_SPACE = "namespace"
 TEST_DATABASE_NAME = "mongo-database"
@@ -40,8 +41,8 @@ def get_config() -> Tuple[MongoConfigTuple, dict[str, str]]:
     Returns:
         Mongo config that stores mongo executable, temporary directory,
             wired_tiger, and delete_temp_dir
-        Deploy config that stores auther_serice_url, auth_url, shock_url,
-            admin_token, admin_roles, namespace, db_name, and mongo_user, and mongo_pwd
+        Deploy config that stores auther_serice_url, auth_url, shock_url, admin_token
+            test_token, admin_roles, namespace, db_name, and mongo_user, and mongo_pwd
     """
     config_path = _get_config_file_path()
     section = _get_test_config(config_path)
@@ -53,8 +54,9 @@ def get_config() -> Tuple[MongoConfigTuple, dict[str, str]]:
 
     auth_serivce_url = _get_value(section, TEST_AUTH_SERVICE_URL, config_path, True)
     auth_url = _get_value(section, TEST_AUTH_URL, config_path, True)
-    blobstore_url = _get_value(section, TEST_BLOBSTORE_URL, config_path, True)
+    shock_url = _get_value(section, TEST_SHOCK_URL, config_path, True)
     admin_token = _get_value(section, TEST_ADMIN_TOKEN, config_path, True)
+    test_token = _get_value(section, TEST_TEST_TOKEN, config_path, True)
     admin_roles = _get_value(section, TEST_ADMIN_ROLES, config_path, True)
     name_space = _get_value(section, TEST_NAME_SPACE, config_path, True)
     db_name = _get_value(section, TEST_DATABASE_NAME, config_path, True)
@@ -71,8 +73,9 @@ def get_config() -> Tuple[MongoConfigTuple, dict[str, str]]:
     deploy_config = {
         TEST_AUTH_SERVICE_URL: auth_serivce_url,
         TEST_AUTH_URL: auth_url,
-        TEST_BLOBSTORE_URL: blobstore_url,
+        TEST_SHOCK_URL: shock_url,
         TEST_ADMIN_TOKEN: admin_token,
+        TEST_TEST_TOKEN: test_token,
         TEST_ADMIN_ROLES: admin_roles,
         TEST_NAME_SPACE: name_space,
         TEST_DATABASE_NAME: db_name,

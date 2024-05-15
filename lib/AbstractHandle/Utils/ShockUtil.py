@@ -53,7 +53,7 @@ class ShockUtil:
                                  .format(resp.status_code, resp.text))
 
     def __init__(self, config):
-        self.shock_url = config.get('blobstore-url')
+        self.shock_url = config.get('shock-url')
         self.admin_token = config.get('admin-token')
 
         self._check_shock_conn(self.shock_url)

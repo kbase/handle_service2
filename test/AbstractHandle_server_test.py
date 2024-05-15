@@ -25,13 +25,13 @@ class handle_serviceTest(unittest.TestCase):
     def setUpClass(cls):
         mongo_config, deploy_config = mongo_util.get_config()
         cls.cfg = deploy_config
-        cls.token = deploy_config['admin-token']
+        cls.token = deploy_config['test-token']
 
         # Getting username from Auth profile for token
         authServiceUrl = cls.cfg['auth-service-url']
         auth_client = _KBaseAuth(authServiceUrl)
         cls.user_id = auth_client.get_user(cls.token)
-        cls.shock_url = cls.cfg['blobstore-url']
+        cls.shock_url = cls.cfg['shock-url']
         # Normally this is a AbstractHandleserver.MethodContext object. However, due to 10+ year
         # old poor design, on import the server loads the config file and sets up the
         # implementation object, which immediately tries to contact Mongo. We don't need the

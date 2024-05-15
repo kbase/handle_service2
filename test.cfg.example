@@ -21,10 +21,13 @@ auth-service-url=https://ci.kbase.us/services/auth/api/legacy/KBase/Sessions/Log
 auth-url=https://ci.kbase.us/services/auth
 
 # The root url of the blob store server.
-blobstore-url=https://ci.kbase.us/services/shock-api
+shock-url=https://ci.kbase.us/services/shock-api
 
-# Use admin token only for `add_read_acl` operation, otherwise a test token is sufficient
+# Blobstore read admin rights
 admin-token=
+
+# Token to run tests
+test-token=
 
 # Admin roles
 admin-roles=HANDLE_ADMIN, KBASE_ADMIN

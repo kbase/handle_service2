@@ -17,7 +17,7 @@ class ShockUtilTest(unittest.TestCase):
     def setUpClass(cls):
         _, deploy_config = mongo_util.get_config()
         cls.cfg = deploy_config
-        cls.token = deploy_config['admin-token']
+        cls.token = deploy_config['test-token']
 
         # Getting username from Auth profile for token
         authServiceUrl = cls.cfg['auth-service-url']
@@ -25,7 +25,7 @@ class ShockUtilTest(unittest.TestCase):
         cls.user_id = auth_client.get_user(cls.token)
 
         cls.shock_util = ShockUtil(cls.cfg)
-        cls.shock_url = cls.cfg['blobstore-url']
+        cls.shock_url = cls.cfg['shock-url']
         cls.shock_ids_to_delete = list()
 
     @classmethod
@@ -87,12 +87,12 @@ class ShockUtilTest(unittest.TestCase):
     @patch.object(ShockUtil, "SERVER_TYPE", new='fake_server_type')
     def test_init_fail(self):
         self.start_test()
-        config = {'blobstore-url': self.shock_url + '/' + 'fake_endpoint_100'}
+        config = {'shock-url': self.shock_url + '/' + 'fake_endpoint_100'}
         with self.assertRaises(ValueError) as context:
             ShockUtil(config)
         self.assertIn('Connot connect to shock server', str(context.exception.args))
 
-        config = {'blobstore-url': self.shock_url}
+        config = {'shock-url': self.shock_url}
         with self.assertRaises(ValueError) as context:
             ShockUtil(config)
         self.assertIn('Unexpected response from shock server', str(context.exception.args))

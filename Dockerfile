@@ -43,13 +43,13 @@ RUN pipenv sync --system
 # -----------------------------------------
 
 COPY ./ /kb/module
-RUN mkdir -p /kb/module/work
+# RUN mkdir -p /kb/module/work
 RUN chmod -R a+rw /kb/module
 
 WORKDIR /kb/module
 
-RUN make build build-startup-script
+# RUN make build build-startup-script
 
-ENTRYPOINT [ "./scripts/entrypoint.sh" ]
+ENTRYPOINT [ "/kb/deployment/bin/dockerize" ]
 
-CMD [ ]
+# CMD [ ]
