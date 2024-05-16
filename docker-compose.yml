@@ -3,7 +3,7 @@ services:
   handle_service2:
     build: .
     ports:
-      - "8080:8080"
+      - "8080:5000"
     environment:
       mongo_host: "mongo:27017"
       mongo_database: handle_service2_test
