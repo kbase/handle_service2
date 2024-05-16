@@ -43,13 +43,10 @@ RUN pipenv sync --system
 # -----------------------------------------
 
 COPY ./ /kb/module
-# RUN mkdir -p /kb/module/work
 RUN chmod -R a+rw /kb/module
-
 WORKDIR /kb/module
 
-# RUN make build build-startup-script
+ENV PYTHONPATH=lib:${PYTHONPATH}
+ENV KB_DEPLOYMENT_CONFIG=/kb/module/deployment/conf/deployment.cfg
 
 ENTRYPOINT [ "/kb/deployment/bin/dockerize" ]
-
-# CMD [ ]
