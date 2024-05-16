@@ -12,7 +12,7 @@ class TokenCacheTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         _, deploy_config = mongo_util.get_config()
-        cls.token = deploy_config["admin-token"]
+        cls.token = deploy_config["test-token"]
         CACHE_EXPIRE_TIME = 300
         cls.token_cache = TokenCache(1000, CACHE_EXPIRE_TIME)
 

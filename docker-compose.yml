@@ -1,0 +1,37 @@
+version: "3.1"
+services:
+  handle_service2:
+    build: .
+    ports:
+      - "8080:8080"
+    environment:
+      mongo_host: "mongo:27017"
+      mongo_database: handle_service2_test
+      auth_url: https://ci.kbase.us/services/auth
+      auth_legacy_url: https://ci.kbase.us/services/auth/api/legacy/KBase/Sessions/Login
+      shock_url: https://ci.kbase.us/services/shock-api
+      # add more configurations here
+    command:
+      - "-multiline"
+      - "-wait"
+      - "tcp://mongo:27017"
+      - "-timeout"
+      - "120s"
+      - "-template"
+      - "/kb/module/deployment/conf/.templates/deployment.cfg.templ:/kb/module/deployment/conf/deployment.cfg"
+      - "uwsgi"
+      - "-master"
+      - "-processes"
+      - "5"
+      - "-threads"
+      - "5"
+      - "-http"
+      - ":5000"
+      - "-wsgi-file"
+      - "/kb/module/lib/AbstractHandle/AbstractHandleServer.py"
+    depends_on: ["mongo"]
+
+  mongo:
+    image: mongo:3.6
+    ports:
+      - "27017:27017"
