@@ -23,7 +23,7 @@ auth-url=https://ci.kbase.us/services/auth
 # The root url of the blob store server.
 shock-url=https://ci.kbase.us/services/shock-api
 
-# Blobstore read admin rights
+# An auth token with Blobstore admin rights
 admin-token=
 
 # Token to run tests

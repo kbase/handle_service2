@@ -21,7 +21,7 @@ TEST_DELETE_TEMP_DIR = "test.delete.temp.dir"
 # Deploy config
 TEST_AUTH_SERVICE_URL = "auth-service-url"
 TEST_AUTH_URL = "auth-url"
-TEST_SHOCK_URL = "shock-url"
+TEST_BLOBSTORE_URL = "shock-url"
 TEST_ADMIN_TOKEN = "admin-token"
 TEST_TEST_TOKEN = "test-token"
 TEST_ADMIN_ROLES = "admin-roles"
@@ -54,7 +54,7 @@ def get_config() -> Tuple[MongoConfigTuple, dict[str, str]]:
 
     auth_serivce_url = _get_value(section, TEST_AUTH_SERVICE_URL, config_path, True)
     auth_url = _get_value(section, TEST_AUTH_URL, config_path, True)
-    shock_url = _get_value(section, TEST_SHOCK_URL, config_path, True)
+    blobstore_url = _get_value(section, TEST_BLOBSTORE_URL, config_path, True)
     admin_token = _get_value(section, TEST_ADMIN_TOKEN, config_path, True)
     test_token = _get_value(section, TEST_TEST_TOKEN, config_path, True)
     admin_roles = _get_value(section, TEST_ADMIN_ROLES, config_path, True)
@@ -73,7 +73,7 @@ def get_config() -> Tuple[MongoConfigTuple, dict[str, str]]:
     deploy_config = {
         TEST_AUTH_SERVICE_URL: auth_serivce_url,
         TEST_AUTH_URL: auth_url,
-        TEST_SHOCK_URL: shock_url,
+        TEST_BLOBSTORE_URL: blobstore_url,
         TEST_ADMIN_TOKEN: admin_token,
         TEST_TEST_TOKEN: test_token,
         TEST_ADMIN_ROLES: admin_roles,

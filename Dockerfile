@@ -46,7 +46,7 @@ COPY ./ /kb/module
 RUN chmod -R a+rw /kb/module
 WORKDIR /kb/module
 
-ENV PYTHONPATH=lib:${PYTHONPATH}
+ENV PYTHONPATH=/kb/module/lib:${PYTHONPATH}
 ENV KB_DEPLOYMENT_CONFIG=/kb/module/deployment/conf/deployment.cfg
 
 ENTRYPOINT [ "/kb/deployment/bin/dockerize" ]

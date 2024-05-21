@@ -39,10 +39,13 @@ jobs:
       env:
         AUTH_SERVICE_URL: https://ci.kbase.us/services/auth/api/legacy/KBase/Sessions/Login
         AUTH_URL: https://ci.kbase.us/services/auth
-        SHOCK_URL: https://ci.kbase.us/services/shock-api
+        BLOBSTORE_URL: https://ci.kbase.us/services/shock-api
         TEST_TOKEN: ${{secrets.KBASE_CI_TOKEN}}
-        ADMIN_TOKEN: ${{secrets.KBASE_CI_TOKEN}}
+        ADMIN_TOKEN: ${{secrets.KBASE_CI_TOKEN2}}
       run: |
+
+        # set HOMEDIR
+        export HOMEDIR=`pwd`
 
         # install python libraries
         python -m pip install --upgrade pip
@@ -64,16 +67,16 @@ jobs:
 
         sed -i "s#^auth-service-url.*#auth-service-url=$AUTH_SERVICE_URL#" test.cfg
         sed -i "s#^auth-url.*#auth-url=$AUTH_URL#" test.cfg
-        sed -i "s#^shock-url.*#shock-url=$SHOCK_URL#" test.cfg
+        sed -i "s#^shock-url.*#shock-url=$BLOBSTORE_URL#" test.cfg
         sed -i "s#^test-token.*#test-token=$TEST_TOKEN#" test.cfg
         sed -i "s#^admin-token.*#admin-token=$ADMIN_TOKEN#" test.cfg
 
     - name: Run tests
       shell: bash
       run: |
-        export PYTHONPATH=test:lib:$PYTHONPATH
-        export HANDLE_SERVICE_TEST_CFG=`pwd`/test.cfg
-        pytest --cov=lib/AbstractHandle --cov-report=xml test
+        export PYTHONPATH=$HOMEDIR/test:$HOMEDIR/lib:$PYTHONPATH
+        export HANDLE_SERVICE_TEST_CFG=$HOMEDIR/test.cfg
+        pytest --cov=$HOMEDIR/lib/AbstractHandle --cov-report=xml test
 
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v3
