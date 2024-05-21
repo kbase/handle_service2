@@ -47,6 +47,8 @@ jobs:
         # set HOMEDIR
         export HOMEDIR=`pwd`
 
+        echo $HOMEDIR
+
         # install python libraries
         python -m pip install --upgrade pip
         pip install pipenv
