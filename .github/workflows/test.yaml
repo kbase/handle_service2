@@ -76,7 +76,7 @@ jobs:
       run: |
         export PYTHONPATH=$HOMEDIR/test:$HOMEDIR/lib:$PYTHONPATH
         export HANDLE_SERVICE_TEST_CFG=$HOMEDIR/test.cfg
-        pytest --cov=$HOMEDIR/lib/AbstractHandle --cov-report=xml test
+        pytest --cov=lib/AbstractHandle --cov-report=xml test
 
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v3
