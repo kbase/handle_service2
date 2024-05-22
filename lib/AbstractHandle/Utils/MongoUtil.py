@@ -1,9 +1,9 @@
-
 import logging
+import traceback
+
 from pymongo import MongoClient, ReturnDocument
 from pymongo.errors import ServerSelectionTimeoutError
-import subprocess
-import traceback
+
 
 MONGO_COLLECTION = 'handle'
 MONGO_HID_COUNTER_COLLECTION = 'handle_id_counter'

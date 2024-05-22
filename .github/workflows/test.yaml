@@ -1,0 +1,84 @@
+name: KBase Handle Service 2 test
+
+on:
+  pull_request:
+    types:
+    - opened
+    - reopened
+    - synchronize
+    - ready_for_review
+  push:
+    # run workflow when merging to main or develop
+    branches:
+      - main
+      - master
+      - develop
+
+jobs:
+  handle_service_tests:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - python: '3.9.19'
+            mongo: 'mongodb-linux-x86_64-3.6.23'
+            wired_tiger: 'false'
+
+    steps:
+    - name: Check out GitHub repo
+      uses: actions/checkout@v4
+
+    - name: Setup Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{matrix.python}}
+
+    - name: Install dependencies and set up test config
+      shell: bash
+      env:
+        AUTH_SERVICE_URL: https://ci.kbase.us/services/auth/api/legacy/KBase/Sessions/Login
+        AUTH_URL: https://ci.kbase.us/services/auth
+        BLOBSTORE_URL: https://ci.kbase.us/services/shock-api
+        TEST_TOKEN: ${{secrets.KBASE_CI_TOKEN}}
+        ADMIN_TOKEN: ${{secrets.KBASE_CI_TOKEN}}
+      run: |
+
+        # install python libraries
+        python -m pip install --upgrade pip
+        pip install pipenv
+        pipenv sync --system --dev
+
+        # set up mongo
+        cd ..
+        wget -q http://fastdl.mongodb.org/linux/${{matrix.mongo}}.tgz
+        tar xfz ${{matrix.mongo}}.tgz
+        export MONGOD=`pwd`/${{matrix.mongo}}/bin/mongod
+        cd -
+
+        # set up test config
+        cp -n test.cfg.example test.cfg
+        sed -i "s#^test.temp.dir =.*#test.temp.dir=temp_test_dir#" test.cfg
+        sed -i "s#^test.mongo.exe.*#test.mongo.exe=$MONGOD#" test.cfg
+        sed -i "s#^test.mongo.wired_tiger.*#test.mongo.wired_tiger=${{matrix.wired_tiger}}#" test.cfg
+
+        sed -i "s#^auth-service-url.*#auth-service-url=$AUTH_SERVICE_URL#" test.cfg
+        sed -i "s#^auth-url.*#auth-url=$AUTH_URL#" test.cfg
+        sed -i "s#^shock-url.*#shock-url=$BLOBSTORE_URL#" test.cfg
+        sed -i "s#^test-token.*#test-token=$TEST_TOKEN#" test.cfg
+        sed -i "s#^admin-token.*#admin-token=$ADMIN_TOKEN#" test.cfg
+
+    - name: Run tests
+      shell: bash
+      run: |
+        export HOMEDIR=`pwd`
+        export PYTHONPATH=$HOMEDIR/test:$HOMEDIR/lib:$PYTHONPATH
+        echo $PYTHONPATH
+        export HANDLE_SERVICE_TEST_CFG=$HOMEDIR/test.cfg
+        pytest --cov=lib/AbstractHandle --cov-report=xml test
+
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v3
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }}
+        fail_ci_if_error: true

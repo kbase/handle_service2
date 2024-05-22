@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 import os
 import unittest
-from configparser import ConfigParser
 import inspect
 import copy
 import threading
@@ -21,18 +20,16 @@ class MongoUtilTest(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        config_file = os.environ.get('KB_DEPLOYMENT_CONFIG', None)
-        cls.cfg = {}
-        config = ConfigParser()
-        config.read(config_file)
-        for nameval in config.items('AbstractHandle'):
-            cls.cfg[nameval[0]] = nameval[1]
-
+        mongo_config, deploy_config = mongo_util.get_config()
+        cls.cfg = deploy_config
         cls.cfg['mongo-authmechanism'] = 'DEFAULT'
-        
-        mongo_exe, mongo_temp = mongo_util.get_mongo_info()
-        # TODO TEST allow testing with wired tiger on or off
-        cls.mongo_controller = MongoController(mongo_exe, mongo_temp, use_wired_tiger=False)
+
+        cls.delete_temp_dir = mongo_config.delete_temp_dir
+        cls.mongo_controller = MongoController(
+            mongo_config.mongo_exe,
+            mongo_config.mongo_temp,
+            use_wired_tiger=mongo_config.use_wired_tiger
+        )
         cls.cfg['mongo-host'] = "localhost"
         cls.cfg["mongo-port"] = cls.mongo_controller.port
         mongo_util.create_test_db(cls.mongo_controller, db=cls.cfg['mongo-database'])
@@ -41,8 +38,7 @@ class MongoUtilTest(unittest.TestCase):
     @classmethod
     def tearDownClass(cls):
         if hasattr(cls, "mongo_controller"):
-            # TODO TEST allow specifying whether test files should be destroyed
-            cls.mongo_controller.destroy(False)
+            cls.mongo_controller.destroy(cls.delete_temp_dir)
         print('Finished testing MongoUtil')
 
     def getMongoUtil(self):

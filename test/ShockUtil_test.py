@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 import os
 import unittest
-from configparser import ConfigParser
 import inspect
 import requests as _requests
 from unittest.mock import patch
@@ -10,19 +9,16 @@ import uuid
 from AbstractHandle.authclient import KBaseAuth as _KBaseAuth
 from AbstractHandle.Utils.ShockUtil import ShockUtil
 
+import mongo_util
 
 class ShockUtilTest(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        cls.token = os.environ.get('KB_AUTH_TOKEN', None)
-        config_file = os.environ.get('KB_DEPLOYMENT_CONFIG', None)
-        cls.cfg = {}
-        config = ConfigParser()
-        config.read(config_file)
-        for nameval in config.items('AbstractHandle'):
-            cls.cfg[nameval[0]] = nameval[1]
-        cls.cfg['admin-token'] = cls.token
+        _, deploy_config = mongo_util.get_config()
+        cls.cfg = deploy_config
+        cls.token = deploy_config['test-token']
+
         # Getting username from Auth profile for token
         authServiceUrl = cls.cfg['auth-service-url']
         auth_client = _KBaseAuth(authServiceUrl)
@@ -57,15 +53,16 @@ class ShockUtilTest(unittest.TestCase):
     def createTestNode(self):
         curr_dir = os.path.dirname(os.path.abspath(__file__))
         filename = 'mytestfile_{}'.format(str(uuid.uuid4()))
+        file_path = os.path.join(curr_dir, filename)
 
-        with open(os.path.join(curr_dir, filename), 'w') as f:
+        with open(file_path, 'w') as f:
             f.write('my test file!')
 
         headers = {'Authorization': 'OAuth {}'.format(self.token)}
 
         end_point = os.path.join(self.shock_url, 'node?filename={}&format=text'.format(filename))
 
-        with open(filename, 'rb') as f:
+        with open(file_path, 'rb') as f:
             resp = _requests.post(end_point, data=f, headers=headers)
 
             if resp.status_code != 200:
