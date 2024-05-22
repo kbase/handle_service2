@@ -41,7 +41,7 @@ jobs:
         AUTH_URL: https://ci.kbase.us/services/auth
         BLOBSTORE_URL: https://ci.kbase.us/services/shock-api
         TEST_TOKEN: ${{secrets.KBASE_CI_TOKEN}}
-        ADMIN_TOKEN: ${{secrets.KBASE_CI_TOKEN2}}
+        ADMIN_TOKEN: ${{secrets.KBASE_CI_TOKEN}}
       run: |
 
         # install python libraries
