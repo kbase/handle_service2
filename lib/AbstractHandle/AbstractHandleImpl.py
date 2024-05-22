@@ -23,8 +23,8 @@ provides a programmatic access to a remote file store
     # the latter method is running.
     ######################################### noqa
     VERSION = "1.0.6"
-    GIT_URL = "https://github.com/kbase/handle_service2"
-    GIT_COMMIT_HASH = "5aca19d0cdacdbeb4b6f48b73faf18b310ba0ccf"
+    GIT_URL = "git@github.com:kbase/handle_service2.git"
+    GIT_COMMIT_HASH = "8c12a514cc5c592dc1af6b221b5646346208bbf8"
 
     #BEGIN_CLASS_HEADER
     MONGO_COLLECTION = 'handle'
