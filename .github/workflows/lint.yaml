@@ -6,11 +6,11 @@ jobs:
   lint:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - name: Set up Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v5
         with:
-          python-version: 3.8
+          python-version: 3.9.19
       - name: Install dependencies
         run: pip install flake8 lintly
       - uses: usama2490/lintly-flake8-github-action@v1.1
@@ -20,4 +20,4 @@ jobs:
           # Fail if "new" violations detected or "any", default "new"
           failIf: new
           # Additional arguments to pass to flake8, default "." (current directory)
-          args: "--max-line-length=99 --exclude=lib/installed_clients/,lib/AbstractHandle/AbstractHandleServer.py --ignore=E305,E265 ."
+          args: "--max-line-length=99 --exclude=lib/installed_clients/,lib/AbstractHandle/AbstractHandleServer.py,lib/AbstractHandle/AbstractHandleClient.py --ignore=E265 ."
