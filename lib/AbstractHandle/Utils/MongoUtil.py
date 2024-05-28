@@ -81,10 +81,11 @@ class MongoUtil:
         """
         get current handle id counter
         """
-        counter = self.hid_counter_collection.find({'_id': {'$eq': self._HID_COUNTER_ID}})
+        cursor = self.hid_counter_collection.find({'_id': {'$eq': self._HID_COUNTER_ID}})
+        counter = list(cursor)
 
-        if counter.count():
-            return counter.next().get('hid_counter')
+        if len(counter):
+            return counter[0].get('hid_counter')
         else:
             return 0
 
