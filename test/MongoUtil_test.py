@@ -212,7 +212,7 @@ class MongoUtilTest(unittest.TestCase):
         self.start_test()
         mongo_util = self.getMongoUtil()
         docs = mongo_util.handle_collection.find()
-        self.assertEqual(docs.count(), 10)
+        self.assertEqual(len(list(docs.clone())), 10)
 
         docs_to_delete = list()
         docs_to_delete.append(docs.next())
@@ -220,15 +220,15 @@ class MongoUtilTest(unittest.TestCase):
         docs_to_delete = docs_to_delete * 2  # test delete duplicate items
         deleted_count = mongo_util.delete_many(docs_to_delete)
         self.assertEqual(deleted_count, 2)
-        self.assertEqual(mongo_util.handle_collection.find().count(), 8)
+        self.assertEqual(mongo_util.handle_collection.count_documents({}), 8)
         docs = mongo_util.find_in([doc.get('hid') for doc in docs_to_delete], 'hid')
-        self.assertEqual(docs.count(), 0)
+        self.assertEqual(len(list(docs)), 0)
 
         for doc in docs_to_delete:
             try:
                 mongo_util.insert_one(doc)
             except Exception:
                 pass
-        self.assertEqual(mongo_util.handle_collection.find().count(), 10)
+        self.assertEqual(mongo_util.handle_collection.count_documents({}), 10)
         docs = mongo_util.find_in([doc.get('hid') for doc in docs_to_delete], 'hid')
-        self.assertEqual(docs.count(), 2)
+        self.assertEqual(len(list(docs)), 2)
