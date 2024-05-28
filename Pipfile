@@ -6,7 +6,7 @@ name = "pypi"
 [packages]
 cachetools = "==4.2.2"
 jsonrpcbase = "==0.2.0"
-pymongo = "==3.8.0"
+pymongo = "==4.7.2"
 requests = "==2.31.0"
 uwsgi = "==2.0.22"
 
