@@ -193,20 +193,20 @@ class MongoUtilTest(unittest.TestCase):
         self.start_test()
         mongo_util = self.getMongoUtil()
         docs = mongo_util.handle_collection.find()
-        self.assertEqual(docs.count(), 10)
+        self.assertEqual(len(list(docs.clone())), 10)
 
         doc = docs.next()
         hid = doc.get('hid')
         mongo_util.delete_one(doc)
-        self.assertEqual(mongo_util.handle_collection.find().count(), 9)
+        self.assertEqual(mongo_util.handle_collection.count_documents(), 9)
 
         docs = mongo_util.find_in([hid], 'hid', projection=None)
-        self.assertEqual(docs.count(), 0)
+        self.assertEqual(len(list(docs)), 0)
 
         mongo_util.insert_one(doc)
-        self.assertEqual(mongo_util.handle_collection.find().count(), 10)
+        self.assertEqual(mongo_util.handle_collection.count_documents(), 10)
         docs = mongo_util.find_in([hid], 'hid', projection=None)
-        self.assertEqual(docs.count(), 1)
+        self.assertEqual(len(list(docs)), 1)
 
     def test_delete_many_ok(self):
         self.start_test()
