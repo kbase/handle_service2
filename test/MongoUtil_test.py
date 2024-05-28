@@ -85,17 +85,17 @@ class MongoUtilTest(unittest.TestCase):
         # test query 'hid' field
         elements = [68020, 68022, 0]
         docs = mongo_util.find_in(elements, 'hid')
-        self.assertEqual(docs.count(), 2)
+        self.assertEqual(len(list(docs)), 2)
 
         # test query 'hid' field with empty data
         elements = [0]
         docs = mongo_util.find_in(elements, 'hid')
-        self.assertEqual(docs.count(), 0)
+        self.assertEqual(len(list(docs)), 0)
 
         # test query 'id' field
         elements = ['b753774f-0bbd-4b96-9202-89b0c70bf31c']
         docs = mongo_util.find_in(elements, 'id')
-        self.assertEqual(docs.count(), 1)
+        self.assertEqual(len(list(docs.clone())), 1)
         doc = docs.next()
         self.assertFalse('_id' in doc.keys())
         self.assertEqual(doc.get('hid'), 68020)
@@ -103,7 +103,7 @@ class MongoUtilTest(unittest.TestCase):
         # test null projection
         elements = ['b753774f-0bbd-4b96-9202-89b0c70bf31c']
         docs = mongo_util.find_in(elements, 'id', projection=None)
-        self.assertEqual(docs.count(), 1)
+        self.assertEqual(len(list(docs.clone())), 1)
         doc = docs.next()
         self.assertEqual(doc.get('_id'), 68020)
         self.assertEqual(doc.get('hid'), 68020)
@@ -114,7 +114,7 @@ class MongoUtilTest(unittest.TestCase):
 
         elements = ['b753774f-0bbd-4b96-9202-89b0c70bf31c']
         docs = mongo_util.find_in(elements, 'id', projection=None)
-        self.assertEqual(docs.count(), 1)
+        self.assertEqual(len(list(docs.clone())), 1)
         doc = docs.next()
         self.assertEqual(doc.get('created_by'), 'tgu2')
 
