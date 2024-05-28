@@ -133,7 +133,7 @@ class MongoUtilTest(unittest.TestCase):
     def test_insert_one_ok(self):
         self.start_test()
         mongo_util = self.getMongoUtil()
-        self.assertEqual(mongo_util.handle_collection.find().count(), 10)
+        self.assertEqual(mongo_util.handle_collection.count_documents({}), 10)
 
         doc = {'_id': 9999, 'hid': 9999, 'file_name': 'fake_file'}
         counter = mongo_util.get_hid_counter()
@@ -141,16 +141,16 @@ class MongoUtilTest(unittest.TestCase):
         new_counter = mongo_util.get_hid_counter()
         self.assertEqual(new_counter, counter)
 
-        self.assertEqual(mongo_util.handle_collection.find().count(), 11)
+        self.assertEqual(mongo_util.handle_collection.count_documents({}), 11)
         elements = [9999]
         docs = mongo_util.find_in(elements, 'hid', projection=None)
-        self.assertEqual(docs.count(), 1)
+        self.assertEqual(len(list(docs.clone())), 1)
         doc = docs.next()
         self.assertEqual(doc.get('hid'), 9999)
         self.assertEqual(doc.get('file_name'), 'fake_file')
 
         mongo_util.delete_one(doc)
-        self.assertEqual(mongo_util.handle_collection.find().count(), 10)
+        self.assertEqual(mongo_util.handle_collection.count_documents({}), 10)
 
     def test_increase_counter_with_multi_threads(self):
 
