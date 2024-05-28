@@ -198,13 +198,13 @@ class MongoUtilTest(unittest.TestCase):
         doc = docs.next()
         hid = doc.get('hid')
         mongo_util.delete_one(doc)
-        self.assertEqual(mongo_util.handle_collection.count_documents(), 9)
+        self.assertEqual(mongo_util.handle_collection.count_documents({}), 9)
 
         docs = mongo_util.find_in([hid], 'hid', projection=None)
         self.assertEqual(len(list(docs)), 0)
 
         mongo_util.insert_one(doc)
-        self.assertEqual(mongo_util.handle_collection.count_documents(), 10)
+        self.assertEqual(mongo_util.handle_collection.count_documents({}), 10)
         docs = mongo_util.find_in([hid], 'hid', projection=None)
         self.assertEqual(len(list(docs)), 1)
 
