@@ -17,6 +17,7 @@ from AbstractHandle.Utils.Handler import Handler
 
 import mongo_util
 from mongo_controller import MongoController
+from test_helper import get_hid_counter
 
 
 class handle_serviceTest(unittest.TestCase):
@@ -59,6 +60,7 @@ class handle_serviceTest(unittest.TestCase):
         mongo_util.create_test_db(cls.mongo_controller, db=cls.cfg['mongo-database'])
         cls.serviceImpl = AbstractHandle(cls.cfg)
         cls.mongo_util = MongoUtil.MongoUtil(cls.cfg)
+        cls.hid_counter_collection = cls.mongo_util.hid_counter_collection
         cls.shock_ids_to_delete = list()
 
     @classmethod
@@ -169,9 +171,9 @@ class handle_serviceTest(unittest.TestCase):
                   'type': 'shock',
                   'url': 'http://ci.kbase.us:7044/'}
         # testing persist_handle with non-existing handle (inserting a handle)
-        counter = self.mongo_util.get_hid_counter()
+        counter = get_hid_counter(self.hid_counter_collection)
         hid = handler.persist_handle(self.ctx, handle)[0]
-        new_counter = self.mongo_util.get_hid_counter()
+        new_counter = get_hid_counter(self.hid_counter_collection)
         self.assertEqual(new_counter, counter + 1)
         handles = handler.fetch_handles_by(self.ctx, {'elements': [hid], 'field_name': 'hid'})[0]
         self.assertEqual(len(handles), 1)
@@ -184,7 +186,7 @@ class handle_serviceTest(unittest.TestCase):
 
         # testing persist_handle a second handle
         hid = handler.persist_handle(self.ctx, handle)[0]
-        new_counter = self.mongo_util.get_hid_counter()
+        new_counter = get_hid_counter(self.hid_counter_collection)
         self.assertEqual(hid, 'KBH_' + str(new_counter))
         self.assertEqual(new_counter, counter + 2)
 
@@ -206,7 +208,7 @@ class handle_serviceTest(unittest.TestCase):
                   'type': 'shock',
                   'url': 'http://ci.kbase.us:7044/'}
 
-        counter = self.mongo_util.get_hid_counter()
+        counter = get_hid_counter(self.hid_counter_collection)
 
         thread_count = 257
 
@@ -226,7 +228,7 @@ class handle_serviceTest(unittest.TestCase):
             result = que.get()
             hids.append(int(result[0].split('KBH_')[-1]))
 
-        new_counter = self.mongo_util.get_hid_counter()
+        new_counter = get_hid_counter(self.hid_counter_collection)
         self.assertEqual(counter + thread_count, new_counter)
 
         self.assertEqual(len(set(hids)), thread_count)

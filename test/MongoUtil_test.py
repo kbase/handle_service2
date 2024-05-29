@@ -11,6 +11,7 @@ from AbstractHandle.Utils.MongoUtil import MongoUtil
 
 import mongo_util
 from mongo_controller import MongoController
+from test_helper import get_hid_counter
 
 
 # TODO switch all tests to pytest, see sample_service for an example
@@ -34,6 +35,7 @@ class MongoUtilTest(unittest.TestCase):
         cls.cfg["mongo-port"] = cls.mongo_controller.port
         mongo_util.create_test_db(cls.mongo_controller, db=cls.cfg['mongo-database'])
         cls.mongo_util = MongoUtil(cls.cfg)
+        cls.hid_counter_collection = cls.mongo_util.hid_counter_collection
 
     @classmethod
     def tearDownClass(cls):
@@ -136,9 +138,9 @@ class MongoUtilTest(unittest.TestCase):
         self.assertEqual(mongo_util.handle_collection.count_documents({}), 10)
 
         doc = {'_id': 9999, 'hid': 9999, 'file_name': 'fake_file'}
-        counter = mongo_util.get_hid_counter()
+        counter = get_hid_counter(self.hid_counter_collection)
         mongo_util.insert_one(doc)
-        new_counter = mongo_util.get_hid_counter()
+        new_counter = get_hid_counter(self.hid_counter_collection)
         self.assertEqual(new_counter, counter)
 
         self.assertEqual(mongo_util.handle_collection.count_documents({}), 11)
@@ -155,7 +157,7 @@ class MongoUtilTest(unittest.TestCase):
     def test_increase_counter_with_multi_threads(self):
 
         mongo_util = self.getMongoUtil()
-        counter = mongo_util.get_hid_counter()
+        counter = get_hid_counter(self.hid_counter_collection)
 
         thread_count = 329
 
@@ -173,7 +175,7 @@ class MongoUtilTest(unittest.TestCase):
         while not que.empty():
             hids.append(que.get())
 
-        new_counter = mongo_util.get_hid_counter()
+        new_counter = get_hid_counter(self.hid_counter_collection)
         self.assertEqual(counter + thread_count, new_counter)
 
         self.assertEqual(len(set(hids)), thread_count)

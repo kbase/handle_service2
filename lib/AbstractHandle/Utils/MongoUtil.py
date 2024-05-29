@@ -77,18 +77,6 @@ class MongoUtil:
         logging.basicConfig(format='%(created)s %(levelname)s: %(message)s',
                             level=logging.INFO)
 
-    def get_hid_counter(self):
-        """
-        get current handle id counter
-        """
-        cursor = self.hid_counter_collection.find({'_id': {'$eq': self._HID_COUNTER_ID}})
-        counter = list(cursor)
-
-        if len(counter):
-            return counter[0].get('hid_counter')
-        else:
-            return 0
-
     def find_in(self, elements, field_name, projection={'_id': False}, batch_size=1000):
         """
         return cursor that contains docs which field column is in elements
