@@ -5,6 +5,7 @@ from pathlib import Path
 
 import mongo_util
 from test_helper import create_temp_file
+from AbstractHandle.Utils.MongoUtil import MongoUtil
 
 
 DEFAULT_TEST_CONFIG_PATH = os.environ[mongo_util.TEST_CONFIG_ENV_PATH]
@@ -55,6 +56,22 @@ class ConfigTest(unittest.TestCase):
         self.assertEqual(deploy_cfg["mongo-user"], "")
         self.assertEqual(deploy_cfg["mongo-password"], "")
         self.assertEqual(deploy_cfg["mongo-retrywrites"], "")
+
+        # make a config and pass it into MongoUtil
+        cfg = deploy_cfg
+        cfg["mongo-host"] = "localhost"
+        cfg["mongo-port"] = 8888
+        cfg["mongo-authmechanism"] = "DEFAULT"
+        mu = MongoUtil(cfg)
+
+        # assert on the instance variables
+        self.assertEqual(mu.mongo_host, "localhost")
+        self.assertEqual(mu.mongo_port, 8888)
+        self.assertEqual(mu.mongo_database, "handle_db")
+        self.assertEqual(mu.mongo_user, "")
+        self.assertEqual(mu.mongo_pass, "")
+        self.assertEqual(mu.mongo_authmechanism, "DEFAULT")
+        self.assertEqual(mu.mongo_retrywrites, False)
 
         # remove temp file
         os.remove(cfg_path)
@@ -107,6 +124,22 @@ class ConfigTest(unittest.TestCase):
         self.assertEqual(deploy_cfg["mongo-user"], "mongouser")
         self.assertEqual(deploy_cfg["mongo-password"], "mongopassword")
         self.assertEqual(deploy_cfg["mongo-retrywrites"], "true")
+
+        # make a config and pass it into MongoUtil
+        cfg = deploy_cfg
+        cfg["mongo-host"] = "localhost"
+        cfg["mongo-port"] = 8888
+        cfg["mongo-authmechanism"] = "DEFAULT"
+        mu = MongoUtil(cfg)
+
+        # assert on the instance variables
+        self.assertEqual(mu.mongo_host, "localhost")
+        self.assertEqual(mu.mongo_port, 8888)
+        self.assertEqual(mu.mongo_database, "handle_db")
+        self.assertEqual(mu.mongo_user, "mongouser")
+        self.assertEqual(mu.mongo_pass, "mongopassword")
+        self.assertEqual(mu.mongo_authmechanism, "DEFAULT")
+        self.assertEqual(mu.mongo_retrywrites, True)
 
         # remove temp file
         os.remove(cfg_path)
