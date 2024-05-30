@@ -20,11 +20,10 @@ class ConfigTest(unittest.TestCase):
         auth-url=https://ci.kbase.us/services/auth\n
         shock-url=https://ci.kbase.us/services/shock-api\n
         admin-token=998\n
-        test-token=998\n
+        test-token=999\n
         admin-roles=HANDLE_ADMIN, KBASE_ADMIN\n
         namespace=KBH\n
-        mongo-database=handle_db\n
-        mongo-retrywrites=false
+        mongo-database=handle_db
         """
         try:
             cfg_path = create_temp_file(data_string)
@@ -49,13 +48,13 @@ class ConfigTest(unittest.TestCase):
             deploy_cfg["shock-url"], "https://ci.kbase.us/services/shock-api"
         )
         self.assertEqual(deploy_cfg["admin-token"], "998")
-        self.assertEqual(deploy_cfg["test-token"], "998")
+        self.assertEqual(deploy_cfg["test-token"], "999")
         self.assertEqual(deploy_cfg["admin-roles"], "HANDLE_ADMIN, KBASE_ADMIN")
         self.assertEqual(deploy_cfg["namespace"], "KBH")
         self.assertEqual(deploy_cfg["mongo-database"], "handle_db")
         self.assertEqual(deploy_cfg["mongo-user"], "")
         self.assertEqual(deploy_cfg["mongo-password"], "")
-        self.assertEqual(deploy_cfg["mongo-retrywrites"], False)
+        self.assertEqual(deploy_cfg["mongo-retrywrites"], "")
 
         # remove temp file
         os.remove(cfg_path)
@@ -70,7 +69,7 @@ class ConfigTest(unittest.TestCase):
         auth-url=https://ci.kbase.us/services/auth\n
         shock-url=https://ci.kbase.us/services/shock-api\n
         admin-token=998\n
-        test-token=998\n
+        test-token=999\n
         admin-roles=HANDLE_ADMIN, KBASE_ADMIN\n
         namespace=KBH\n
         mongo-database=handle_db\n
@@ -101,13 +100,13 @@ class ConfigTest(unittest.TestCase):
             deploy_cfg["shock-url"], "https://ci.kbase.us/services/shock-api"
         )
         self.assertEqual(deploy_cfg["admin-token"], "998")
-        self.assertEqual(deploy_cfg["test-token"], "998")
+        self.assertEqual(deploy_cfg["test-token"], "999")
         self.assertEqual(deploy_cfg["admin-roles"], "HANDLE_ADMIN, KBASE_ADMIN")
         self.assertEqual(deploy_cfg["namespace"], "KBH")
         self.assertEqual(deploy_cfg["mongo-database"], "handle_db")
         self.assertEqual(deploy_cfg["mongo-user"], "mongouser")
         self.assertEqual(deploy_cfg["mongo-password"], "mongopassword")
-        self.assertEqual(deploy_cfg["mongo-retrywrites"], True)
+        self.assertEqual(deploy_cfg["mongo-retrywrites"], "true")
 
         # remove temp file
         os.remove(cfg_path)

@@ -64,7 +64,7 @@ def get_config() -> Tuple[MongoConfigTuple, dict[str, str]]:
     db_name = _get_value(section, TEST_DATABASE_NAME, config_path, True)
     mongo_user = _get_value(section, TEST_DATABASE_USER, config_path, False)
     mongo_pwd = _get_value(section, TEST_DATABASE_PWD, config_path, False)
-    mongo_retrywrites = _get_value(section, TEST_MONGO_RETRYWRITES, config_path, True)
+    mongo_retrywrites = _get_value(section, TEST_MONGO_RETRYWRITES, config_path, False)
 
     mongo_config = MongoConfigTuple(
         Path(mongo_exe_path),
@@ -84,7 +84,7 @@ def get_config() -> Tuple[MongoConfigTuple, dict[str, str]]:
         TEST_DATABASE_NAME: db_name,
         TEST_DATABASE_USER: mongo_user,
         TEST_DATABASE_PWD: mongo_pwd,
-        TEST_MONGO_RETRYWRITES: mongo_retrywrites == "true",
+        TEST_MONGO_RETRYWRITES: mongo_retrywrites,
     }
 
     return mongo_config, deploy_config

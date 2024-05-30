@@ -62,7 +62,7 @@ class MongoUtil:
         self.mongo_user = config['mongo-user']
         self.mongo_pass = config['mongo-password']
         self.mongo_authmechanism = config['mongo-authmechanism']
-        self.mongo_retrywrites = config['mongo-retrywrites']
+        self.mongo_retrywrites = config.get('mongo-retrywrites') == "true"
 
         self.handle_collection = self._get_collection(self.mongo_host, self.mongo_port,
                                                       self.mongo_database, MONGO_COLLECTION,
