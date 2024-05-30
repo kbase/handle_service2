@@ -7,6 +7,9 @@ import mongo_util
 from test_helper import create_temp_file
 
 
+DEFAULT_TEST_CONFIG_PATH = os.environ[mongo_util.TEST_CONFIG_ENV_PATH]
+
+
 class ConfigTest(unittest.TestCase):
 
     def test_minimal_config(self):
@@ -25,11 +28,10 @@ class ConfigTest(unittest.TestCase):
         """
         try:
             cfg_path = create_temp_file(data_string)
-            default_path = os.environ[mongo_util.TEST_CONFIG_ENV_PATH]
             os.environ[mongo_util.TEST_CONFIG_ENV_PATH] = cfg_path
             mongo_cfg, deploy_cfg = mongo_util.get_config()
         finally:
-            os.environ[mongo_util.TEST_CONFIG_ENV_PATH] = default_path
+            os.environ[mongo_util.TEST_CONFIG_ENV_PATH] = DEFAULT_TEST_CONFIG_PATH
 
         # check mongo config
         self.assertEqual(mongo_cfg.mongo_exe, Path("mongod"))
@@ -78,11 +80,10 @@ class ConfigTest(unittest.TestCase):
         """
         try:
             cfg_path = create_temp_file(data_string)
-            default_path = os.environ[mongo_util.TEST_CONFIG_ENV_PATH]
             os.environ[mongo_util.TEST_CONFIG_ENV_PATH] = cfg_path
             mongo_cfg, deploy_cfg = mongo_util.get_config()
         finally:
-            os.environ[mongo_util.TEST_CONFIG_ENV_PATH] = default_path
+            os.environ[mongo_util.TEST_CONFIG_ENV_PATH] = DEFAULT_TEST_CONFIG_PATH
 
         # check mongo config
         self.assertEqual(mongo_cfg.mongo_exe, Path("mongod"))
