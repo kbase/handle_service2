@@ -13,7 +13,8 @@ class MongoUtil:
     _HID_COUNTER_ID = 'hid_counter'
 
     def _get_collection(self, mongo_host, mongo_port, mongo_database, mongo_collection,
-                        mongo_user=None, mongo_password=None, mongo_authmechanism='DEFAULT'):
+                        mongo_user=None, mongo_password=None, mongo_authmechanism='DEFAULT',
+                        mongo_retrywrites=False):
         """
         connect Mongo server and return a collection
         """
@@ -23,10 +24,11 @@ class MongoUtil:
             my_client = MongoClient(mongo_host, mongo_port,
                                     username=mongo_user, password=mongo_password,
                                     authSource=mongo_database,
-                                    authMechanism=mongo_authmechanism)
+                                    authMechanism=mongo_authmechanism,
+                                    retry_writes=mongo_retrywrites)
         else:
             logging.info('no mongo-user found in config file, connecting without auth')
-            my_client = MongoClient(mongo_host, mongo_port)
+            my_client = MongoClient(mongo_host, mongo_port, retry_writes=mongo_retrywrites)
 
         try:
             my_client.server_info()  # force a call to server
@@ -60,11 +62,13 @@ class MongoUtil:
         self.mongo_user = config['mongo-user']
         self.mongo_pass = config['mongo-password']
         self.mongo_authmechanism = config['mongo-authmechanism']
+        self.mongo_retrywrites = config['mongo-retrywrites']
 
         self.handle_collection = self._get_collection(self.mongo_host, self.mongo_port,
                                                       self.mongo_database, MONGO_COLLECTION,
                                                       self.mongo_user, self.mongo_pass,
-                                                      self.mongo_authmechanism)
+                                                      self.mongo_authmechanism,
+                                                      self.mongo_retrywrites)
         # create index on startup to speed up fetching
         self.handle_collection.create_index('hid', unique=True)
 
@@ -72,7 +76,8 @@ class MongoUtil:
                                                            self.mongo_database,
                                                            MONGO_HID_COUNTER_COLLECTION,
                                                            self.mongo_user, self.mongo_pass,
-                                                           self.mongo_authmechanism)
+                                                           self.mongo_authmechanism,
+                                                           self.mongo_retrywrites)
 
         logging.basicConfig(format='%(created)s %(levelname)s: %(message)s',
                             level=logging.INFO)

@@ -29,6 +29,7 @@ TEST_NAME_SPACE = "namespace"
 TEST_DATABASE_NAME = "mongo-database"
 TEST_DATABASE_USER = "mongo-user"
 TEST_DATABASE_PWD = "mongo-password"
+TEST_MONGO_RETRYWRITES = "mongo-retrywrites"
 
 MongoConfigTuple = namedtuple(
     "MongoConfigTuple",
@@ -42,7 +43,8 @@ def get_config() -> Tuple[MongoConfigTuple, dict[str, str]]:
         Mongo config that stores mongo executable, temporary directory,
             wired_tiger, and delete_temp_dir
         Deploy config that stores auther_serice_url, auth_url, shock_url, admin_token
-            test_token, admin_roles, namespace, db_name, and mongo_user, and mongo_pwd
+            test_token, admin_roles, namespace, db_name, mongo_user, mongo_pwd,
+            and mongo_retrywrites
     """
     config_path = _get_config_file_path()
     section = _get_test_config(config_path)
@@ -62,6 +64,7 @@ def get_config() -> Tuple[MongoConfigTuple, dict[str, str]]:
     db_name = _get_value(section, TEST_DATABASE_NAME, config_path, True)
     mongo_user = _get_value(section, TEST_DATABASE_USER, config_path, False)
     mongo_pwd = _get_value(section, TEST_DATABASE_PWD, config_path, False)
+    mongo_retrywrites = _get_value(section, TEST_MONGO_RETRYWRITES, config_path, True)
 
     mongo_config = MongoConfigTuple(
         Path(mongo_exe_path),
@@ -81,6 +84,7 @@ def get_config() -> Tuple[MongoConfigTuple, dict[str, str]]:
         TEST_DATABASE_NAME: db_name,
         TEST_DATABASE_USER: mongo_user,
         TEST_DATABASE_PWD: mongo_pwd,
+        TEST_MONGO_RETRYWRITES: mongo_retrywrites == "true",
     }
 
     return mongo_config, deploy_config
