@@ -1,10 +1,10 @@
 import os
-import tempfile
 import unittest
 
 from pathlib import Path
 
 import mongo_util
+from test_helper import create_temp_file
 
 
 class ConfigTest(unittest.TestCase):
@@ -24,7 +24,7 @@ class ConfigTest(unittest.TestCase):
         mongo-retrywrites=false
         """
         try:
-            cfg_path = self._create_temp_file(data_string)
+            cfg_path = create_temp_file(data_string)
             default_path = os.environ[mongo_util.TEST_CONFIG_ENV_PATH]
             os.environ[mongo_util.TEST_CONFIG_ENV_PATH] = cfg_path
             mongo_cfg, deploy_cfg = mongo_util.get_config()
@@ -77,7 +77,7 @@ class ConfigTest(unittest.TestCase):
         mongo-retrywrites=true
         """
         try:
-            cfg_path = self._create_temp_file(data_string)
+            cfg_path = create_temp_file(data_string)
             default_path = os.environ[mongo_util.TEST_CONFIG_ENV_PATH]
             os.environ[mongo_util.TEST_CONFIG_ENV_PATH] = cfg_path
             mongo_cfg, deploy_cfg = mongo_util.get_config()
@@ -110,13 +110,3 @@ class ConfigTest(unittest.TestCase):
 
         # remove temp file
         os.remove(cfg_path)
-
-    def _create_temp_file(data_string):
-        try:
-            with tempfile.NamedTemporaryFile(mode="w", delete=False) as temp_file:
-                temp_file.write(data_string)
-                file_path = temp_file.name
-            return file_path
-
-        except Exception as e:
-            raise ValueError("An error occurred:") from e
