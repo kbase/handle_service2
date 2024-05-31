@@ -49,6 +49,12 @@ class MongoUtilTest(unittest.TestCase):
         testname = inspect.stack()[1][3]
         print('\n*** starting test: ' + testname + ' **')
 
+    def test_retryWrites(self):
+        new_cfg = dict(self.cfg)
+        new_cfg['mongo-retrywrites'] = "true"
+        mu = MongoUtil(new_cfg)
+        self.assertCountEqual(mu.mongo_retrywrites, True)
+
     def test_get_collection(self):
         self.start_test()
         mongo_util = self.getMongoUtil()
