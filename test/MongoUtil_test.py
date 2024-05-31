@@ -65,6 +65,7 @@ class MongoUtilTest(unittest.TestCase):
         ]
         mongo_util = self.getMongoUtil()
         self.assertTrue(set(class_attri) <= set(mongo_util.__dict__.keys()))
+        self.assertEqual(mongo_util.mongo_retrywrites, False)
 
         handle_collection = mongo_util.handle_collection
         self.assertEqual(handle_collection.name, 'handle')
