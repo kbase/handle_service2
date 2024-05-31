@@ -53,7 +53,7 @@ class MongoUtilTest(unittest.TestCase):
         new_cfg = dict(self.cfg)
         new_cfg['mongo-retrywrites'] = "true"
         mu = MongoUtil(new_cfg)
-        self.assertCountEqual(mu.mongo_retrywrites, True)
+        self.assertEqual(mu.mongo_retrywrites, True)
 
     def test_get_collection(self):
         self.start_test()
