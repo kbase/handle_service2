@@ -22,9 +22,9 @@ provides a programmatic access to a remote file store
     # state. A method could easily clobber the state set by another while
     # the latter method is running.
     ######################################### noqa
-    VERSION = "1.0.6"
+    VERSION = "1.0.7"
     GIT_URL = "git@github.com:kbase/handle_service2.git"
-    GIT_COMMIT_HASH = "8c12a514cc5c592dc1af6b221b5646346208bbf8"
+    GIT_COMMIT_HASH = "2213d274f478e42f3c8dd796a2cd07ed8f086692"
 
     #BEGIN_CLASS_HEADER
     MONGO_COLLECTION = 'handle'
