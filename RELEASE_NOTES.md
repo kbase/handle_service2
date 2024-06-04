@@ -1,6 +1,15 @@
 # handle_service release notes
 =========================================
 
+## 1.0.7
+* The MongoDB clients have been updated to the most recent version and the service tested against Mongo 7.
+* Added the mongo-retrywrites configuration setting in deployment.cfg.templ, defaulting to false.
+* Added the docker-compose file to start a handle service server in test mode.
+* Added pipenv to handle dependencies.
+* Removed Mongo setup from Dockerfile and converted test to run without `kb-sdk`.
+* Fixed broken Lintly in GHA.
+* Updated Python to 3.9.19.
+
 ## 1.0.6
 
 * Added jitpack build for Java client
