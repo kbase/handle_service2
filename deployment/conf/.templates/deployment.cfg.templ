@@ -5,6 +5,7 @@ mongo-database = {{ default .Env.mongo_database "handle_db" }}
 mongo-authmechanism = {{ default .Env.mongo_authmechanism "DEFAULT" }}
 mongo-user = {{ default .Env.mongo_user "" }}
 mongo-password = {{ default .Env.mongo_password "" }}
+mongo-retrywrites={{ default .Env.mongo_retrywrites "false" }}
 
 start-local-mongo = {{ default .Env.start_local_mongo "0" }}
 

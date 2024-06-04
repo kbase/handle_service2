@@ -13,6 +13,7 @@ from AbstractHandle.Utils.MongoUtil import MongoUtil
 
 import mongo_util
 from mongo_controller import MongoController
+from test_helper import get_hid_counter
 
 class HandlerTest(unittest.TestCase):
 
@@ -174,9 +175,9 @@ class HandlerTest(unittest.TestCase):
                   'type': 'shock',
                   'url': 'http://ci.kbase.us:7044/'}
         # testing persist_handle with non-existing handle (inserting a handle)
-        counter = handler.mongo_util.get_hid_counter()
+        counter = get_hid_counter(handler.mongo_util.hid_counter_collection)
         hid = handler.persist_handle(handle, self.user_id)
-        new_counter = handler.mongo_util.get_hid_counter()
+        new_counter = get_hid_counter(handler.mongo_util.hid_counter_collection)
         self.assertEqual(new_counter, counter + 1)  # counter should increment
         handles = handler.fetch_handles_by({'elements': [hid], 'field_name': 'hid'})
         self.assertEqual(len(handles), 1)
