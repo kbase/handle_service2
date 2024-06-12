@@ -76,7 +76,6 @@ jobs:
       run: |
         export HOMEDIR=`pwd`
         export PYTHONPATH=$HOMEDIR/test:$HOMEDIR/lib:$PYTHONPATH
-        echo $PYTHONPATH
         export HANDLE_SERVICE_TEST_CFG=$HOMEDIR/test.cfg
         pytest --cov=lib/AbstractHandle --cov-report=xml test
 
