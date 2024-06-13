@@ -1,4 +1,4 @@
-FROM python:3.9.19
+FROM python:3.12.4
 MAINTAINER KBase Developer
 # -----------------------------------------
 # In this section, you can install any system dependencies required
