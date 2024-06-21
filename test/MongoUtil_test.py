@@ -70,6 +70,11 @@ class MongoUtilTest(unittest.TestCase):
             'hid_counter_collection',
         ]
         mongo_util = self.getMongoUtil()
+
+        # Access lazy init properties to trigger their initialization
+        _ = mongo_util.handle_collection
+        _ = mongo_util.hid_counter_collection
+
         self.assertTrue(set(class_attri) <= set(mongo_util.__dict__.keys()))
         self.assertEqual(mongo_util.mongo_retrywrites, False)
 
