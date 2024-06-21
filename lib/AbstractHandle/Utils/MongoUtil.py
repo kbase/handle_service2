@@ -28,8 +28,8 @@ class MongoUtil:
 
         if mongo_user:
             logging.info(
-                "mongo-user found in config file, configuring client for authentication using mech "
-                + str(mongo_authmechanism)
+                f"mongo-user found in config file, configuring client"
+                + f"for authentication using mech {mongo_authmechanism}"
             )
             my_client = MongoClient(
                 mongo_host,
