@@ -56,6 +56,8 @@ class MongoUtil:
                                                                return_document=ReturnDocument.AFTER)['hid_counter']
 
     def __init__(self, config):
+        self._hid_counter_collection = None
+        self._handle_collection = None
         self.mongo_host = config['mongo-host']
         self.mongo_port = int(config['mongo-port'])
         self.mongo_database = config['mongo-database']
@@ -64,23 +66,31 @@ class MongoUtil:
         self.mongo_authmechanism = config['mongo-authmechanism']
         self.mongo_retrywrites = config.get('mongo-retrywrites') == "true"
 
-        self.handle_collection = self._get_collection(self.mongo_host, self.mongo_port,
-                                                      self.mongo_database, MONGO_COLLECTION,
-                                                      self.mongo_user, self.mongo_pass,
-                                                      self.mongo_authmechanism,
-                                                      self.mongo_retrywrites)
-        # create index on startup to speed up fetching
-        self.handle_collection.create_index('hid', unique=True)
-
-        self.hid_counter_collection = self._get_collection(self.mongo_host, self.mongo_port,
-                                                           self.mongo_database,
-                                                           MONGO_HID_COUNTER_COLLECTION,
-                                                           self.mongo_user, self.mongo_pass,
-                                                           self.mongo_authmechanism,
-                                                           self.mongo_retrywrites)
 
         logging.basicConfig(format='%(created)s %(levelname)s: %(message)s',
                             level=logging.INFO)
+
+
+    @property
+    def handle_collection(self):
+        if self._handle_collection is None:
+            self._handle_collection = self._get_collection(self.config['mongo-host'], int(self.config['mongo-port']),
+                                                           self.config['mongo-database'], MONGO_COLLECTION,
+                                                           self.config['mongo-user'], self.config['mongo-password'],
+                                                           self.config['mongo-authmechanism'],
+                                                           self.config.get('mongo-retrywrites') == "true")
+            self._handle_collection.create_index('hid', unique=True) #Might need to move this out of here
+        return self._handle_collection
+
+    @property
+    def hid_counter_collection(self):
+        if self._hid_counter_collection is None:
+            self._hid_counter_collection = self._get_collection(self.config['mongo-host'], int(self.config['mongo-port']),
+                                                                self.config['mongo-database'], MONGO_HID_COUNTER_COLLECTION,
+                                                                self.config['mongo-user'], self.config['mongo-password'],
+                                                                self.config['mongo-authmechanism'],
+                                                                self.config.get('mongo-retrywrites') == "true")
+        return self._hid_counter_collection
 
     def find_in(self, elements, field_name, projection={'_id': False}, batch_size=1000):
         """
