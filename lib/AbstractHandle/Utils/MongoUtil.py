@@ -56,6 +56,7 @@ class MongoUtil:
                                                                return_document=ReturnDocument.AFTER)['hid_counter']
 
     def __init__(self, config):
+        self.config = config
         self._hid_counter_collection = None
         self._handle_collection = None
         self.mongo_host = config['mongo-host']
