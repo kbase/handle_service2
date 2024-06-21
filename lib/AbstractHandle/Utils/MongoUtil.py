@@ -4,12 +4,11 @@ import traceback
 from pymongo import MongoClient, ReturnDocument
 from pymongo.errors import ServerSelectionTimeoutError
 
-
 MONGO_COLLECTION = 'handle'
 MONGO_HID_COUNTER_COLLECTION = 'handle_id_counter'
 
-class MongoUtil:
 
+class MongoUtil:
     _HID_COUNTER_ID = 'hid_counter'
 
     def _get_collection(self, mongo_host, mongo_port, mongo_database, mongo_collection,
@@ -20,7 +19,7 @@ class MongoUtil:
         """
 
         if mongo_user:
-            logging.info('mongo-user found in config file, configuring client for authentication using mech ' + str(mongo_authmechanism) )
+            logging.info('mongo-user found in config file, configuring client for authentication using mech ' + str(mongo_authmechanism))
             my_client = MongoClient(mongo_host, mongo_port,
                                     username=mongo_user, password=mongo_password,
                                     authSource=mongo_database,
@@ -35,8 +34,8 @@ class MongoUtil:
         except ServerSelectionTimeoutError as e:
             error_msg = 'Connot connect to Mongo server\n'
             error_msg += 'ERROR -- {}:\n{}'.format(
-                            e,
-                            ''.join(traceback.format_exception(None, e, e.__traceback__)))
+                e,
+                ''.join(traceback.format_exception(None, e, e.__traceback__)))
             raise ValueError(error_msg)
 
         # TODO: check potential problems. MongoDB will create the collection if it does not exist.
@@ -67,28 +66,32 @@ class MongoUtil:
         self.mongo_authmechanism = config['mongo-authmechanism']
         self.mongo_retrywrites = config.get('mongo-retrywrites') == "true"
 
-
         logging.basicConfig(format='%(created)s %(levelname)s: %(message)s',
                             level=logging.INFO)
-
 
     @property
     def handle_collection(self):
         if self._handle_collection is None:
-            self._handle_collection = self._get_collection(self.config['mongo-host'], int(self.config['mongo-port']),
-                                                           self.config['mongo-database'], MONGO_COLLECTION,
-                                                           self.config['mongo-user'], self.config['mongo-password'],
+            self._handle_collection = self._get_collection(self.config['mongo-host'],
+                                                           int(self.config['mongo-port']),
+                                                           self.config['mongo-database'],
+                                                           MONGO_COLLECTION,
+                                                           self.config['mongo-user'],
+                                                           self.config['mongo-password'],
                                                            self.config['mongo-authmechanism'],
                                                            self.config.get('mongo-retrywrites') == "true")
-            self._handle_collection.create_index('hid', unique=True) #Might need to move this out of here
+            self._handle_collection.create_index('hid', unique=True)
         return self._handle_collection
 
     @property
     def hid_counter_collection(self):
         if self._hid_counter_collection is None:
-            self._hid_counter_collection = self._get_collection(self.config['mongo-host'], int(self.config['mongo-port']),
-                                                                self.config['mongo-database'], MONGO_HID_COUNTER_COLLECTION,
-                                                                self.config['mongo-user'], self.config['mongo-password'],
+            self._hid_counter_collection = self._get_collection(self.config['mongo-host'],
+                                                                int(self.config['mongo-port']),
+                                                                self.config['mongo-database'],
+                                                                MONGO_HID_COUNTER_COLLECTION,
+                                                                self.config['mongo-user'],
+                                                                self.config['mongo-password'],
                                                                 self.config['mongo-authmechanism'],
                                                                 self.config.get('mongo-retrywrites') == "true")
         return self._hid_counter_collection
@@ -105,8 +108,8 @@ class MongoUtil:
         except Exception as e:
             error_msg = 'Connot query doc\n'
             error_msg += 'ERROR -- {}:\n{}'.format(
-                            e,
-                            ''.join(traceback.format_exception(None, e, e.__traceback__)))
+                e,
+                ''.join(traceback.format_exception(None, e, e.__traceback__)))
             raise ValueError(error_msg)
 
         return result
@@ -122,8 +125,8 @@ class MongoUtil:
         except Exception as e:
             error_msg = 'Connot insert doc\n'
             error_msg += 'ERROR -- {}:\n{}'.format(
-                            e,
-                            ''.join(traceback.format_exception(None, e, e.__traceback__)))
+                e,
+                ''.join(traceback.format_exception(None, e, e.__traceback__)))
             raise ValueError(error_msg)
 
         return True
@@ -141,8 +144,8 @@ class MongoUtil:
         except Exception as e:
             error_msg = 'Connot update doc\n'
             error_msg += 'ERROR -- {}:\n{}'.format(
-                            e,
-                            ''.join(traceback.format_exception(None, e, e.__traceback__)))
+                e,
+                ''.join(traceback.format_exception(None, e, e.__traceback__)))
             raise ValueError(error_msg)
 
         return True
@@ -159,8 +162,8 @@ class MongoUtil:
         except Exception as e:
             error_msg = 'Connot delete doc\n'
             error_msg += 'ERROR -- {}:\n{}'.format(
-                            e,
-                            ''.join(traceback.format_exception(None, e, e.__traceback__)))
+                e,
+                ''.join(traceback.format_exception(None, e, e.__traceback__)))
             raise ValueError(error_msg)
 
         return True
@@ -178,8 +181,8 @@ class MongoUtil:
         except Exception as e:
             error_msg = 'Connot delete docs\n'
             error_msg += 'ERROR -- {}:\n{}'.format(
-                            e,
-                            ''.join(traceback.format_exception(None, e, e.__traceback__)))
+                e,
+                ''.join(traceback.format_exception(None, e, e.__traceback__)))
             raise ValueError(error_msg)
         else:
             deleted_count = result.deleted_count
