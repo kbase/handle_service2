@@ -66,8 +66,8 @@ class MongoUtilTest(unittest.TestCase):
     def test_init_ok(self):
         self.start_test()
         class_attri = [
-            'mongo_host', 'mongo_port', 'mongo_database', 'handle_collection', 
-            'hid_counter_collection',
+            'mongo_host', 'mongo_port', 'mongo_database', '_handle_collection',
+            '_hid_counter_collection',
         ]
         mongo_util = self.getMongoUtil()
 
