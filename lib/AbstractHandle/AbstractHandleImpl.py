@@ -42,7 +42,7 @@ provides a programmatic access to a remote file store
         self.config.setdefault('mongo-authmechanism', self.MONGO_AUTHMECHANISM)
 
         logging.basicConfig(format='%(created)s %(levelname)s: %(message)s',
-                            level=logging.INFO)
+                            level=logging.DEBUG)
 
         self.handler = Handler(self.config)
         #END_CONSTRUCTOR
