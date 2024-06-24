@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
-import os
 import unittest
-from configparser import ConfigParser
 import inspect
 import copy
 import threading
@@ -12,6 +10,7 @@ from AbstractHandle.Utils.MongoUtil import MongoUtil
 
 import mongo_util
 from mongo_controller import MongoController
+from test_helper import get_hid_counter
 
 
 # TODO switch all tests to pytest, see sample_service for an example
@@ -21,28 +20,26 @@ class MongoUtilTest(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        config_file = os.environ.get('KB_DEPLOYMENT_CONFIG', None)
-        cls.cfg = {}
-        config = ConfigParser()
-        config.read(config_file)
-        for nameval in config.items('AbstractHandle'):
-            cls.cfg[nameval[0]] = nameval[1]
-
+        mongo_config, deploy_config = mongo_util.get_config()
+        cls.cfg = deploy_config
         cls.cfg['mongo-authmechanism'] = 'DEFAULT'
-        
-        mongo_exe, mongo_temp = mongo_util.get_mongo_info()
-        # TODO TEST allow testing with wired tiger on or off
-        cls.mongo_controller = MongoController(mongo_exe, mongo_temp, use_wired_tiger=False)
+
+        cls.delete_temp_dir = mongo_config.delete_temp_dir
+        cls.mongo_controller = MongoController(
+            mongo_config.mongo_exe,
+            mongo_config.mongo_temp,
+            use_wired_tiger=mongo_config.use_wired_tiger
+        )
         cls.cfg['mongo-host'] = "localhost"
         cls.cfg["mongo-port"] = cls.mongo_controller.port
         mongo_util.create_test_db(cls.mongo_controller, db=cls.cfg['mongo-database'])
         cls.mongo_util = MongoUtil(cls.cfg)
+        cls.hid_counter_collection = cls.mongo_util.hid_counter_collection
 
     @classmethod
     def tearDownClass(cls):
         if hasattr(cls, "mongo_controller"):
-            # TODO TEST allow specifying whether test files should be destroyed
-            cls.mongo_controller.destroy(False)
+            cls.mongo_controller.destroy(cls.delete_temp_dir)
         print('Finished testing MongoUtil')
 
     def getMongoUtil(self):
@@ -51,6 +48,12 @@ class MongoUtilTest(unittest.TestCase):
     def start_test(self):
         testname = inspect.stack()[1][3]
         print('\n*** starting test: ' + testname + ' **')
+
+    def test_retryWrites(self):
+        new_cfg = dict(self.cfg)
+        new_cfg['mongo-retrywrites'] = "true"
+        mu = MongoUtil(new_cfg)
+        self.assertEqual(mu.mongo_retrywrites, True)
 
     def test_get_collection(self):
         self.start_test()
@@ -63,11 +66,17 @@ class MongoUtilTest(unittest.TestCase):
     def test_init_ok(self):
         self.start_test()
         class_attri = [
-            'mongo_host', 'mongo_port', 'mongo_database', 'handle_collection', 
-            'hid_counter_collection',
+            'mongo_host', 'mongo_port', 'mongo_database', '_handle_collection',
+            '_hid_counter_collection',
         ]
         mongo_util = self.getMongoUtil()
+
+        # Access lazy init properties to trigger their initialization
+        _ = mongo_util.handle_collection
+        _ = mongo_util.hid_counter_collection
+
         self.assertTrue(set(class_attri) <= set(mongo_util.__dict__.keys()))
+        self.assertEqual(mongo_util.mongo_retrywrites, False)
 
         handle_collection = mongo_util.handle_collection
         self.assertEqual(handle_collection.name, 'handle')
@@ -89,17 +98,17 @@ class MongoUtilTest(unittest.TestCase):
         # test query 'hid' field
         elements = [68020, 68022, 0]
         docs = mongo_util.find_in(elements, 'hid')
-        self.assertEqual(docs.count(), 2)
+        self.assertEqual(len(list(docs)), 2)
 
         # test query 'hid' field with empty data
         elements = [0]
         docs = mongo_util.find_in(elements, 'hid')
-        self.assertEqual(docs.count(), 0)
+        self.assertEqual(len(list(docs)), 0)
 
         # test query 'id' field
         elements = ['b753774f-0bbd-4b96-9202-89b0c70bf31c']
         docs = mongo_util.find_in(elements, 'id')
-        self.assertEqual(docs.count(), 1)
+        self.assertEqual(len(list(docs.clone())), 1)
         doc = docs.next()
         self.assertFalse('_id' in doc.keys())
         self.assertEqual(doc.get('hid'), 68020)
@@ -107,7 +116,7 @@ class MongoUtilTest(unittest.TestCase):
         # test null projection
         elements = ['b753774f-0bbd-4b96-9202-89b0c70bf31c']
         docs = mongo_util.find_in(elements, 'id', projection=None)
-        self.assertEqual(docs.count(), 1)
+        self.assertEqual(len(list(docs.clone())), 1)
         doc = docs.next()
         self.assertEqual(doc.get('_id'), 68020)
         self.assertEqual(doc.get('hid'), 68020)
@@ -118,7 +127,7 @@ class MongoUtilTest(unittest.TestCase):
 
         elements = ['b753774f-0bbd-4b96-9202-89b0c70bf31c']
         docs = mongo_util.find_in(elements, 'id', projection=None)
-        self.assertEqual(docs.count(), 1)
+        self.assertEqual(len(list(docs.clone())), 1)
         doc = docs.next()
         self.assertEqual(doc.get('created_by'), 'tgu2')
 
@@ -137,29 +146,29 @@ class MongoUtilTest(unittest.TestCase):
     def test_insert_one_ok(self):
         self.start_test()
         mongo_util = self.getMongoUtil()
-        self.assertEqual(mongo_util.handle_collection.find().count(), 10)
+        self.assertEqual(mongo_util.handle_collection.count_documents({}), 10)
 
         doc = {'_id': 9999, 'hid': 9999, 'file_name': 'fake_file'}
-        counter = mongo_util.get_hid_counter()
+        counter = get_hid_counter(self.hid_counter_collection)
         mongo_util.insert_one(doc)
-        new_counter = mongo_util.get_hid_counter()
+        new_counter = get_hid_counter(self.hid_counter_collection)
         self.assertEqual(new_counter, counter)
 
-        self.assertEqual(mongo_util.handle_collection.find().count(), 11)
+        self.assertEqual(mongo_util.handle_collection.count_documents({}), 11)
         elements = [9999]
         docs = mongo_util.find_in(elements, 'hid', projection=None)
-        self.assertEqual(docs.count(), 1)
+        self.assertEqual(len(list(docs.clone())), 1)
         doc = docs.next()
         self.assertEqual(doc.get('hid'), 9999)
         self.assertEqual(doc.get('file_name'), 'fake_file')
 
         mongo_util.delete_one(doc)
-        self.assertEqual(mongo_util.handle_collection.find().count(), 10)
+        self.assertEqual(mongo_util.handle_collection.count_documents({}), 10)
 
     def test_increase_counter_with_multi_threads(self):
 
         mongo_util = self.getMongoUtil()
-        counter = mongo_util.get_hid_counter()
+        counter = get_hid_counter(self.hid_counter_collection)
 
         thread_count = 329
 
@@ -177,7 +186,7 @@ class MongoUtilTest(unittest.TestCase):
         while not que.empty():
             hids.append(que.get())
 
-        new_counter = mongo_util.get_hid_counter()
+        new_counter = get_hid_counter(self.hid_counter_collection)
         self.assertEqual(counter + thread_count, new_counter)
 
         self.assertEqual(len(set(hids)), thread_count)
@@ -197,26 +206,26 @@ class MongoUtilTest(unittest.TestCase):
         self.start_test()
         mongo_util = self.getMongoUtil()
         docs = mongo_util.handle_collection.find()
-        self.assertEqual(docs.count(), 10)
+        self.assertEqual(len(list(docs.clone())), 10)
 
         doc = docs.next()
         hid = doc.get('hid')
         mongo_util.delete_one(doc)
-        self.assertEqual(mongo_util.handle_collection.find().count(), 9)
+        self.assertEqual(mongo_util.handle_collection.count_documents({}), 9)
 
         docs = mongo_util.find_in([hid], 'hid', projection=None)
-        self.assertEqual(docs.count(), 0)
+        self.assertEqual(len(list(docs)), 0)
 
         mongo_util.insert_one(doc)
-        self.assertEqual(mongo_util.handle_collection.find().count(), 10)
+        self.assertEqual(mongo_util.handle_collection.count_documents({}), 10)
         docs = mongo_util.find_in([hid], 'hid', projection=None)
-        self.assertEqual(docs.count(), 1)
+        self.assertEqual(len(list(docs)), 1)
 
     def test_delete_many_ok(self):
         self.start_test()
         mongo_util = self.getMongoUtil()
         docs = mongo_util.handle_collection.find()
-        self.assertEqual(docs.count(), 10)
+        self.assertEqual(len(list(docs.clone())), 10)
 
         docs_to_delete = list()
         docs_to_delete.append(docs.next())
@@ -224,15 +233,15 @@ class MongoUtilTest(unittest.TestCase):
         docs_to_delete = docs_to_delete * 2  # test delete duplicate items
         deleted_count = mongo_util.delete_many(docs_to_delete)
         self.assertEqual(deleted_count, 2)
-        self.assertEqual(mongo_util.handle_collection.find().count(), 8)
+        self.assertEqual(mongo_util.handle_collection.count_documents({}), 8)
         docs = mongo_util.find_in([doc.get('hid') for doc in docs_to_delete], 'hid')
-        self.assertEqual(docs.count(), 0)
+        self.assertEqual(len(list(docs)), 0)
 
         for doc in docs_to_delete:
             try:
                 mongo_util.insert_one(doc)
             except Exception:
                 pass
-        self.assertEqual(mongo_util.handle_collection.find().count(), 10)
+        self.assertEqual(mongo_util.handle_collection.count_documents({}), 10)
         docs = mongo_util.find_in([doc.get('hid') for doc in docs_to_delete], 'hid')
-        self.assertEqual(docs.count(), 2)
+        self.assertEqual(len(list(docs)), 2)

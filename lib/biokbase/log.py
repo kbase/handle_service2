@@ -364,5 +364,6 @@ class log(object):
             if self.get_log_file():
                 self._log(ident, message)
 
+
 if __name__ == '__main__':
     pass

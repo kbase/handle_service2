@@ -25,7 +25,8 @@ compile:
 	kb-sdk compile $(SPEC_FILE) \
 		--out $(LIB_DIR) \
 		--pysrvname $(SERVICE_CAPS).$(SERVICE_CAPS)Server \
-		--pyimplname $(SERVICE_CAPS).$(SERVICE_CAPS)Impl;
+		--pyimplname $(SERVICE_CAPS).$(SERVICE_CAPS)Impl \
+		--pyclname $(SERVICE_CAPS).$(SERVICE_CAPS)Client;
 	kb-sdk compile $(SPEC_FILE) \
 		--out . \
 		--java \

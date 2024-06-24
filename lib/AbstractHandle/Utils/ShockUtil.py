@@ -1,8 +1,7 @@
-
 import logging
 import os
-import traceback
 import requests as _requests
+import traceback
 
 
 class ShockUtil:

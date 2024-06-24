@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 import os
 import unittest
-from configparser import ConfigParser
 import inspect
 import copy
 import requests as _requests
@@ -14,30 +13,29 @@ from AbstractHandle.Utils.MongoUtil import MongoUtil
 
 import mongo_util
 from mongo_controller import MongoController
+from test_helper import get_hid_counter
 
 class HandlerTest(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        cls.token = os.environ.get('KB_AUTH_TOKEN', None)
-        config_file = os.environ.get('KB_DEPLOYMENT_CONFIG', None)
-        cls.cfg = {}
-        config = ConfigParser()
-        config.read(config_file)
-        for nameval in config.items('AbstractHandle'):
-            cls.cfg[nameval[0]] = nameval[1]
-        cls.cfg['admin-token'] = cls.token
-        cls.cfg['mongo-authmechanism'] = 'DEFAULT'
+        mongo_config, deploy_config = mongo_util.get_config()
+        cls.cfg = deploy_config
+        cls.token = deploy_config['test-token']
 
+        cls.cfg['mongo-authmechanism'] = 'DEFAULT'
         # Getting username from Auth profile for token
         authServiceUrl = cls.cfg['auth-service-url']
         auth_client = _KBaseAuth(authServiceUrl)
         cls.user_id = auth_client.get_user(cls.token)
         cls.shock_url = cls.cfg['shock-url']
-        
-        mongo_exe, mongo_temp = mongo_util.get_mongo_info()
-        # TODO TEST allow testing with wired tiger on or off
-        cls.mongo_controller = MongoController(mongo_exe, mongo_temp, use_wired_tiger=False)
+
+        cls.delete_temp_dir = mongo_config.delete_temp_dir
+        cls.mongo_controller = MongoController(
+            mongo_config.mongo_exe,
+            mongo_config.mongo_temp,
+            use_wired_tiger=mongo_config.use_wired_tiger
+        )
         cls.cfg['mongo-host'] = "localhost"
         cls.cfg["mongo-port"] = cls.mongo_controller.port
         mongo_util.create_test_db(cls.mongo_controller, db=cls.cfg['mongo-database'])
@@ -50,8 +48,7 @@ class HandlerTest(unittest.TestCase):
     @classmethod
     def tearDownClass(cls):
         if hasattr(cls, "mongo_controller"):
-            # TODO TEST allow specifying whether test files should be destroyed
-            cls.mongo_controller.destroy(False)
+            cls.mongo_controller.destroy(cls.delete_temp_dir)
         if hasattr(cls, 'shock_ids_to_delete'):
             print('Nodes to delete: {}'.format(cls.shock_ids_to_delete))
             cls.deleteShockID(cls.shock_ids_to_delete)
@@ -78,15 +75,16 @@ class HandlerTest(unittest.TestCase):
     def createTestNode(self):
         curr_dir = os.path.dirname(os.path.abspath(__file__))
         filename = 'mytestfile_{}'.format(str(uuid.uuid4()))
+        file_path = os.path.join(curr_dir, filename)
 
-        with open(os.path.join(curr_dir, filename), 'w') as f:
+        with open(file_path, 'w') as f:
             f.write('my test file!')
 
         headers = {'Authorization': 'OAuth {}'.format(self.token)}
 
         end_point = os.path.join(self.shock_url, 'node?filename={}&format=text'.format(filename))
 
-        with open(filename, 'rb') as f:
+        with open(file_path, 'rb') as f:
             resp = _requests.post(end_point, data=f, headers=headers)
 
             if resp.status_code != 200:
@@ -177,9 +175,9 @@ class HandlerTest(unittest.TestCase):
                   'type': 'shock',
                   'url': 'http://ci.kbase.us:7044/'}
         # testing persist_handle with non-existing handle (inserting a handle)
-        counter = handler.mongo_util.get_hid_counter()
+        counter = get_hid_counter(handler.mongo_util.hid_counter_collection)
         hid = handler.persist_handle(handle, self.user_id)
-        new_counter = handler.mongo_util.get_hid_counter()
+        new_counter = get_hid_counter(handler.mongo_util.hid_counter_collection)
         self.assertEqual(new_counter, counter + 1)  # counter should increment
         handles = handler.fetch_handles_by({'elements': [hid], 'field_name': 'hid'})
         self.assertEqual(len(handles), 1)
@@ -314,7 +312,7 @@ class HandlerTest(unittest.TestCase):
         delete_count = handler.delete_handles(handles_to_delete, self.user_id)
         self.assertEqual(delete_count, len(hids))
 
-    def test__get_token_roles(self):
+    def test_get_token_roles(self):
         self.start_test()
         handler = self.getHandler()
 

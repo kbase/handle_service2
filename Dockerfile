@@ -1,4 +1,4 @@
-FROM kbase/sdkpython:3.8.10
+FROM python:3.9.19
 MAINTAINER KBase Developer
 # -----------------------------------------
 # In this section, you can install any system dependencies required
@@ -28,51 +28,25 @@ RUN wget -q https://github.com/kbase/dockerize/raw/master/dockerize-linux-amd64-
 RUN mkdir -p /kb/deployment/bin/
 RUN ln -s /opt/dockerize /kb/deployment/bin/dockerize
 
-###################
-### install mongodb
-###################
-
-# TODO Set things up so we can test against multiple versions of Mongo in GHA. This might work?
-ENV MONGO_VER=mongodb-linux-x86_64-3.6.23
-
-RUN mkdir -p /mongo/tmpdata
-WORKDIR /mongo
-RUN wget -q http://fastdl.mongodb.org/linux/$MONGO_VER.tgz
-RUN tar xfz $MONGO_VER.tgz && rm $MONGO_VER.tgz
-ENV MONGO_EXE_PATH=/mongo/$MONGO_VER/bin/mongod
-ENV MONGO_TEMP_DIR=/mongo/tmpdata
-RUN echo $MONGO_EXE_PATH
-RUN echo $MONGO_TEMP_DIR
-RUN $MONGO_EXE_PATH --version
-
 #######################
-### Install python deps
+### install python deps
 #######################
 
-RUN conda config --add channels conda-forge
-# uwsgi install fails with pip due to some kind of incompatibility with conda
-# note this step takes FOREVER
-# should probably try to get rid of conda, it's a nightmare to deal with
-RUN conda install -y uwsgi=2.0.22
+# install pipenv
+RUN pip install --upgrade pip && \
+    pip install pipenv
 
-# Conda fails to install these due to what appears to be an overly strict dependency graph solver
-RUN pip install \
-        pymongo==3.8.0 \
-        mock==4.0.3 \
-        cachetools==4.2.2 \
-        coverage==5.5 \
-        semver==3.0.2
+# install deps
+COPY Pipfile* ./
+RUN pipenv sync --system
 
 # -----------------------------------------
 
 COPY ./ /kb/module
-RUN mkdir -p /kb/module/work
 RUN chmod -R a+rw /kb/module
-
 WORKDIR /kb/module
 
-RUN make all
+ENV PYTHONPATH=/kb/module/lib:${PYTHONPATH}
+ENV KB_DEPLOYMENT_CONFIG=/kb/module/deployment/conf/deployment.cfg
 
-ENTRYPOINT [ "./scripts/entrypoint.sh" ]
-
-CMD [ ]
+ENTRYPOINT [ "/kb/deployment/bin/dockerize" ]

@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 import os
 import unittest
-from configparser import ConfigParser
 import inspect
 import copy
 import requests as _requests
@@ -18,20 +17,17 @@ from AbstractHandle.Utils.Handler import Handler
 
 import mongo_util
 from mongo_controller import MongoController
+from test_helper import get_hid_counter
 
 
 class handle_serviceTest(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        cls.token = os.environ.get('KB_AUTH_TOKEN', None)
-        config_file = os.environ.get('KB_DEPLOYMENT_CONFIG', None)
-        cls.cfg = {}
-        config = ConfigParser()
-        config.read(config_file)
-        for nameval in config.items('AbstractHandle'):
-            cls.cfg[nameval[0]] = nameval[1]
-        cls.cfg['admin-token'] = cls.token
+        mongo_config, deploy_config = mongo_util.get_config()
+        cls.cfg = deploy_config
+        cls.token = deploy_config['test-token']
+
         # Getting username from Auth profile for token
         authServiceUrl = cls.cfg['auth-service-url']
         auth_client = _KBaseAuth(authServiceUrl)
@@ -52,23 +48,25 @@ class handle_serviceTest(unittest.TestCase):
                     ],
                     'authenticated': 1
         }
-        cls.scratch = cls.cfg['scratch']
-        cls.callback_url = os.environ['SDK_CALLBACK_URL']
-        mongo_exe, mongo_temp = mongo_util.get_mongo_info()
-        # TODO TEST allow testing with wired tiger on or off
-        cls.mongo_controller = MongoController(mongo_exe, mongo_temp, use_wired_tiger=False)
+
+        cls.delete_temp_dir = mongo_config.delete_temp_dir
+        cls.mongo_controller = MongoController(
+            mongo_config.mongo_exe,
+            mongo_config.mongo_temp,
+            use_wired_tiger=mongo_config.use_wired_tiger
+        )
         cls.cfg['mongo-host'] = "localhost"
         cls.cfg["mongo-port"] = cls.mongo_controller.port
         mongo_util.create_test_db(cls.mongo_controller, db=cls.cfg['mongo-database'])
         cls.serviceImpl = AbstractHandle(cls.cfg)
         cls.mongo_util = MongoUtil.MongoUtil(cls.cfg)
+        cls.hid_counter_collection = cls.mongo_util.hid_counter_collection
         cls.shock_ids_to_delete = list()
 
     @classmethod
     def tearDownClass(cls):
         if hasattr(cls, "mongo_controller"):
-            # TODO TEST allow specifying whether test files should be destroyed
-            cls.mongo_controller.destroy(False)
+            cls.mongo_controller.destroy(cls.delete_temp_dir)
         if hasattr(cls, 'shock_ids_to_delete'):
             print('Nodes to delete: {}'.format(cls.shock_ids_to_delete))
             cls.deleteShockID(cls.shock_ids_to_delete)
@@ -93,15 +91,16 @@ class handle_serviceTest(unittest.TestCase):
     def createTestNode(self):
         curr_dir = os.path.dirname(os.path.abspath(__file__))
         filename = 'mytestfile_{}'.format(str(uuid.uuid4()))
+        file_path = os.path.join(curr_dir, filename)
 
-        with open(os.path.join(curr_dir, filename), 'w') as f:
+        with open(file_path, 'w') as f:
             f.write('my test file!')
 
         headers = {'Authorization': 'OAuth {}'.format(self.token)}
 
         end_point = os.path.join(self.shock_url, 'node?filename={}&format=text'.format(filename))
 
-        with open(filename, 'rb') as f:
+        with open(file_path, 'rb') as f:
             resp = _requests.post(end_point, data=f, headers=headers)
 
             if resp.status_code != 200:
@@ -172,9 +171,9 @@ class handle_serviceTest(unittest.TestCase):
                   'type': 'shock',
                   'url': 'http://ci.kbase.us:7044/'}
         # testing persist_handle with non-existing handle (inserting a handle)
-        counter = self.mongo_util.get_hid_counter()
+        counter = get_hid_counter(self.hid_counter_collection)
         hid = handler.persist_handle(self.ctx, handle)[0]
-        new_counter = self.mongo_util.get_hid_counter()
+        new_counter = get_hid_counter(self.hid_counter_collection)
         self.assertEqual(new_counter, counter + 1)
         handles = handler.fetch_handles_by(self.ctx, {'elements': [hid], 'field_name': 'hid'})[0]
         self.assertEqual(len(handles), 1)
@@ -187,7 +186,7 @@ class handle_serviceTest(unittest.TestCase):
 
         # testing persist_handle a second handle
         hid = handler.persist_handle(self.ctx, handle)[0]
-        new_counter = self.mongo_util.get_hid_counter()
+        new_counter = get_hid_counter(self.hid_counter_collection)
         self.assertEqual(hid, 'KBH_' + str(new_counter))
         self.assertEqual(new_counter, counter + 2)
 
@@ -209,7 +208,7 @@ class handle_serviceTest(unittest.TestCase):
                   'type': 'shock',
                   'url': 'http://ci.kbase.us:7044/'}
 
-        counter = self.mongo_util.get_hid_counter()
+        counter = get_hid_counter(self.hid_counter_collection)
 
         thread_count = 257
 
@@ -229,7 +228,7 @@ class handle_serviceTest(unittest.TestCase):
             result = que.get()
             hids.append(int(result[0].split('KBH_')[-1]))
 
-        new_counter = self.mongo_util.get_hid_counter()
+        new_counter = get_hid_counter(self.hid_counter_collection)
         self.assertEqual(counter + thread_count, new_counter)
 
         self.assertEqual(len(set(hids)), thread_count)
