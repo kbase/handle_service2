@@ -9,6 +9,7 @@
 * Removed Mongo setup from Dockerfile and converted test to run without `kb-sdk`.
 * Fixed broken Lintly in GHA.
 * Updated Python to 3.9.19.
+* Modified MongoUtil to defer Mongo client initialization, preventing "MongoClient opened before fork" error with uwsgi prefork + threads.
 
 ## 1.0.6
 

@@ -66,10 +66,15 @@ class MongoUtilTest(unittest.TestCase):
     def test_init_ok(self):
         self.start_test()
         class_attri = [
-            'mongo_host', 'mongo_port', 'mongo_database', 'handle_collection', 
-            'hid_counter_collection',
+            'mongo_host', 'mongo_port', 'mongo_database', '_handle_collection',
+            '_hid_counter_collection',
         ]
         mongo_util = self.getMongoUtil()
+
+        # Access lazy init properties to trigger their initialization
+        _ = mongo_util.handle_collection
+        _ = mongo_util.hid_counter_collection
+
         self.assertTrue(set(class_attri) <= set(mongo_util.__dict__.keys()))
         self.assertEqual(mongo_util.mongo_retrywrites, False)
 
