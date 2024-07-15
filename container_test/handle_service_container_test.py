@@ -89,8 +89,8 @@ def create_handle_and_pull(blod_id: str, token: str) -> None:
 
 def create_node(token: str) -> str:
     """create a node in CI blobstore"""
-
-    with open(FILE_NAME, "rb") as file:
+    file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), FILE_NAME)
+    with open(file_path, "rb") as file:
         response = requests.post(
             BLOB_URL + "/node",
             headers={
