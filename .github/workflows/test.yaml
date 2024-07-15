@@ -79,6 +79,9 @@ jobs:
         export HANDLE_SERVICE_TEST_CFG=$HOMEDIR/test.cfg
         pytest --cov=lib/AbstractHandle --cov-report=xml test
 
+        # run handle service container test
+        sh container_test/run_tests.sh
+
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v3
       with:
