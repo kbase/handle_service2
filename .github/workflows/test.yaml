@@ -73,6 +73,8 @@ jobs:
 
     - name: Run tests
       shell: bash
+      env:
+        TEST_TOKEN: ${{secrets.KBASE_CI_TOKEN}}
       run: |
         export HOMEDIR=`pwd`
         export PYTHONPATH=$HOMEDIR/test:$HOMEDIR/lib:$PYTHONPATH

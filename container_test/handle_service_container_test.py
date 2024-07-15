@@ -22,6 +22,7 @@ sh scripts/run_tests.sh
 # setup TEST_TOKEN as env or provide a TOKEN_FILE_PATH
 # export TEST_TOKEN="your-kb-ci-token"
 TOKEN_FILE_PATH = None
+
 HANDLE_SERVICE_VERSION = "1.0.7"
 FILE_NAME = "mylittlefile"
 
@@ -45,9 +46,13 @@ def wait_for_hs():
             hs.status()
             return
         except Exception as e:
-            print(f"Failed to connect to handle service, waiting {t} sec and trying again:\n\t{e}")
+            print(
+                f"Failed to connect to handle service, waiting {t} sec and trying again:\n\t{e}"
+            )
         time.sleep(t)
-    raise Exception(f"Couldn't connect to the workspace after {len(WAIT_TIMES)} attempts")
+    raise Exception(
+        f"Couldn't connect to the workspace after {len(WAIT_TIMES)} attempts"
+    )
 
 
 def test_handle_service(ready) -> None:
@@ -85,15 +90,15 @@ def create_handle_and_pull(blod_id: str, token: str) -> None:
 def create_node(token: str) -> str:
     """create a node in CI blobstore"""
 
-    with open(FILE_NAME, 'rb') as file:
+    with open(FILE_NAME, "rb") as file:
         response = requests.post(
             BLOB_URL + "/node",
             headers={
-                "content-type":"application/json",
-                'Authorization': f'OAuth {token}'
+                "content-type": "application/json",
+                "Authorization": f"OAuth {token}",
             },
-            files={'file': file},
-            params={'filename': FILE_NAME, 'format': 'text'}
+            files={"file": file},
+            params={"filename": FILE_NAME, "format": "text"},
         )
 
     assert response.status_code == 200
@@ -121,7 +126,7 @@ def get_token(token_filepath: Optional[str]) -> str:
         token = os.environ.get("TEST_TOKEN")
     if not token:
         raise ValueError(
-            f"Need to provide a token in the TEST_TOKEN "
-            + f"environment variable or as token_filepath argument"
+            "Need to provide a token in the TEST_TOKEN environment variable "
+            "or a token_filepath argument"
         )
     return token
