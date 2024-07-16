@@ -43,9 +43,9 @@ def wait_for_hs():
 
     attempt = 1
     max_attempts = len(WAIT_TIMES) + 1
+    hs = AbstractHandle(HS_URL)
     while attempt <= max_attempts:
         print(f"Attempt {attempt} of {max_attempts}")
-        hs = AbstractHandle(HS_URL)
         try:
             hs.status()
             return
