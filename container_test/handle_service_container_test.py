@@ -39,19 +39,26 @@ def ready():
 
 
 def wait_for_hs():
-    print("waiting for workspace service...")
-    hs = AbstractHandle(HS_URL)
-    for t in WAIT_TIMES:
+    print("waiting for handle service...")
+
+    attempt = 1
+    max_attempts = len(WAIT_TIMES) + 1
+    while attempt <= max_attempts:
+        print(f"Attempt {attempt} of {max_attempts}")
+        hs = AbstractHandle(HS_URL)
         try:
             hs.status()
             return
         except Exception as e:
-            print(
-                f"Failed to connect to handle service, waiting {t} sec and trying again:\n\t{e}"
-            )
-        time.sleep(t)
+            if attempt < max_attempts:
+                t = WAIT_TIMES[attempt - 1]
+                print(
+                    f"Failed to connect to handle service, waiting {t} sec and trying again:\n\t{e}"
+                )
+                time.sleep(t)
+            attempt += 1
     raise Exception(
-        f"Couldn't connect to the workspace after {len(WAIT_TIMES)} attempts"
+        f"Couldn't connect to the handle service after {max_attempts} attempts"
     )
 
 
@@ -94,7 +101,7 @@ def create_node(token: str) -> str:
         response = requests.post(
             BLOB_URL + "/node",
             headers={
-                "content-type": "application/json",
+                "Content-Type": "text/plain",
                 "Authorization": f"OAuth {token}",
             },
             files={"file": file},
@@ -103,7 +110,6 @@ def create_node(token: str) -> str:
 
     assert response.status_code == 200
     node_data = response.json()
-    assert "data" in node_data
     return node_data["data"]["id"]
 
 

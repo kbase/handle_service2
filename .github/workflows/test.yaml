@@ -15,6 +15,30 @@ on:
       - develop
 
 jobs:
+  handle_service_container_tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out GitHub repo
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.9.19"
+
+      - name: Install dependencies and set up test config
+        shell: bash
+        run: |
+          # set up python dependencies
+          pip install pytest requests
+
+      - name: Run tests
+        env:
+          TEST_TOKEN: ${{secrets.KBASE_CI_TOKEN}}
+        shell: bash
+        run: |
+          sh container_test/run_tests.sh
+
   handle_service_tests:
     runs-on: ubuntu-latest
     strategy:
@@ -73,16 +97,11 @@ jobs:
 
     - name: Run tests
       shell: bash
-      env:
-        TEST_TOKEN: ${{secrets.KBASE_CI_TOKEN}}
       run: |
         export HOMEDIR=`pwd`
         export PYTHONPATH=$HOMEDIR/test:$HOMEDIR/lib:$PYTHONPATH
         export HANDLE_SERVICE_TEST_CFG=$HOMEDIR/test.cfg
         pytest --cov=lib/AbstractHandle --cov-report=xml test
-
-        # run handle service container test
-        sh container_test/run_tests.sh
 
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v3
