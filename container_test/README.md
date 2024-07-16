@@ -1,0 +1,1 @@
+This directory contains a very small test suite that runs against the handle service in a docker container.
