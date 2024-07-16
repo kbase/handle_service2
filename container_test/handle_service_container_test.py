@@ -53,7 +53,8 @@ def wait_for_hs():
             if attempt < max_attempts:
                 t = WAIT_TIMES[attempt - 1]
                 print(
-                    f"Failed to connect to handle service, waiting {t} sec and trying again:\n\t{e}"
+                    f"Failed to connect to handle service, waiting {t} sec "
+                    f"and trying again:\n\t{e}"
                 )
                 time.sleep(t)
             attempt += 1
